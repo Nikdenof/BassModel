@@ -15,14 +15,17 @@ def c_t(x, p, q, m):
 popt, pcov = curve_fit(c_t, data.cum_sum[0:11], data.revenues[1:12])
 
 
-data.plot(x = 'week', y = 'revenues')
-plt.show()
+def rel_plot():
+    data.plot(x = 'week', y = 'revenues')
+    plt.show()
 
 
-data.plot(x = 'week', y = 'cum_sum')
-plt.show()
+def sum_plot():
+    data.plot(x = 'week', y = 'cum_sum')
+    plt.show()
 
 
 # rev_plot but for fit data
-plt.plot(data['week'], c_t(data['cum_sum'], *popt))
-plt.show()
+def fit_plot():
+    plt.plot(data['week'], c_t(data['cum_sum'], *popt))
+    plt.show()
