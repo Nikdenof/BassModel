@@ -98,3 +98,11 @@ def cum_fit_plot(data, CS):
 #Uncomment to run
 cum_fit_plot(cad_ru, CS_ru)
 cum_fit_plot(cad_en, CS_en)
+
+#Вывод переменных
+print('p,q,m для иностранного ПО', pt_en)
+print('p,q,m для отечественного ПО', popt_ru)
+
+#Результаты аппроксимации
+print('Аппроксимация продаж для иностранного ПО \n', S_en)
+print('Аппроксимация продаж для отечественного ПО \n', S_ru)
