@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
@@ -33,7 +34,25 @@ def c_t(x, p, q, m):
     return (p+(q/m)*(x))*(m-x)
 
 
+len_table = int(table.shape[0])
 popt, pcov = curve_fit(c_t, data.cum_sum[0:11], data.revenues[1:12])
+pt_en, pc_en = curve_fit(c_t, cad_en.cum_sum[0:5], cad_en.revenues[1:6])
+popt_ru, pcov_ru = curve_fit(c_t, cad_ru.cum_sum[0:5], cad_ru.revenues[1:6], maxfev=5000)
+
+
+def bass_model(p, q, m, T = 15):
+    Y = [0]
+    S = []
+    for t in range(T):
+        s = p * m + (q - p) * Y[t] - (q / m) * Y[t] ** 2
+        S.append(s)
+        y = Y[t] + s
+        Y.append(y)
+    return S, np.cumsum(S) 
+        
+
+S_ru, CS_ru = bass_model(*popt_ru)
+S_en, CS_ru = bass_model(*pt_en)
 
 
 def rel_plot():
@@ -55,6 +74,9 @@ def sum_plot():
 
 
 # rev_plot but for fit data
-def fit_plot():
-    plt.plot(data['week'], c_t(data['cum_sum'], *popt))
+def fit_plot(data, S):
+    plt.plot(data['Years'], data['revenues'], label = "Реальные данные")
+    plt.plot(np.arange(len(S)), S, label = "Предсказанные данные")
+    plt.title('Сравнение прогноза и данных')
+    plt.legend(loc = 'best')
     plt.show()
