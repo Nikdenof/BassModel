@@ -55,7 +55,7 @@ S_ru, CS_ru = bass_model(*popt_ru)
 S_en, CS_ru = bass_model(*pt_en)
 
 
-def rel_plot():
+def rel_plot(): #delete to run
     plt.plot(cad_en['Years'], cad_en['revenues'], label = 'Иностранная продукция')
     plt.plot(cad_ru['Years'], cad_ru['revenues'], label = 'Отечественная продукция')
     plt.plot(cad_sum['Years'], cad_sum['revenues'], label = 'Суммарные продажи')
@@ -64,7 +64,7 @@ def rel_plot():
     plt.show()
 
 
-def sum_plot():
+def sum_plot(): #delete to run
     plt.plot(cad_en['Years'], cad_en['cum_sum'], label = 'Иностранная продукция')
     plt.plot(cad_ru['Years'], cad_ru['cum_sum'], label = 'Отечественная продукция')
     plt.plot(cad_sum['Years'], cad_sum['cum_sum'], label = 'Суммарные продажи')
@@ -80,3 +80,7 @@ def fit_plot(data, S):
     plt.title('Сравнение прогноза и данных')
     plt.legend(loc = 'best')
     plt.show()
+
+#Uncomment to run
+#fit_plot(cad_ru, S_ru)
+#fit_plot(cad_en, S_en)
