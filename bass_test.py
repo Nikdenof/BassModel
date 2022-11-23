@@ -45,7 +45,7 @@ def bass_model(p, q, m, T = 15):
         S.append(s)
         y = Y[t] + s
         Y.append(y)
-    return S, np.cumsum(S) 
+    return np.array(S), np.cumsum(S) 
         
 
 S_ru, CS_ru = bass_model(*popt_ru)
@@ -80,7 +80,8 @@ def fit_plot(data, S):
     plt.legend(loc = 'best')
     plt.show()
 
-#Uncomment to run
+
+# Uncomment to run
 fit_plot(cad_ru, S_ru)
 fit_plot(cad_en, S_en)
 
@@ -95,14 +96,34 @@ def cum_fit_plot(data, CS):
     plt.show()
 
 
-#Uncomment to run
+# MASE -Средняя абсолютная масштабированная ошибка 
+def mase(S_fit, df):
+    S_real = df['revenues'].to_numpy()
+    forecast_error = np.mean(np.abs(S_real - S_fit))
+    naive_forecast = np.mean(np.abs(np.diff(S_real)))
+    mase = forecast_error - naive_forecast
+    
+    return mase
+
+
+# Uncomment to run
 cum_fit_plot(cad_ru, CS_ru)
 cum_fit_plot(cad_en, CS_en)
 
-#Вывод переменных
+# Вывод переменных
 print('p,q,m для иностранного ПО', pt_en)
 print('p,q,m для отечественного ПО', popt_ru)
 
-#Результаты аппроксимации
+# Результаты аппроксимации
 print('Аппроксимация продаж для иностранного ПО \n', S_en)
 print('Аппроксимация продаж для отечественного ПО \n', S_ru)
+
+
+# Оценка ошибки
+
+
+# Оценка ошибки
+S_ru_error, CS_ru_error = bass_model(*popt_ru, T = 6)
+S_en_error, CS_en_error = bass_model(*pt_en, T = 6)
+print('Средняя абсолютная масштабированная ошибка для прогноза продаж отечественногo ПО', mase(S_ru_error, cad_ru))
+print('Средняя абсолютная масштабированная ошибка для прогноза продаж иностранного  ПО', mase(S_en_error, cad_en))
