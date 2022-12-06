@@ -30,8 +30,16 @@ cad_sum, cs_sum = cum_sum_add(cad_sum)
 
 
 # Получение коэффициентов линейной модели спроса
-def x1_t(X, n1, n2, a, b, y):
+def x_t(X, a, b, y):
     x1, x2 = X # Кумулятивные продажи первого и второго продукта
-    return a - b * (n1 - x1) + y * (n2 - x2) 
+    #return a - b * (n1 - x1) + y * (n2 - x2) 
+    return a - b * x1 + y * x2 
 
 
+popt_en, _ = curve_fit(x_t, (cs_en[0:5], cs_ru[0:5]), cs_en[1:6])
+
+
+a, b, y = popt_en
+
+plt.plot(np.arange(5), x_t((cs_en[0:5], cs_ru[0:5]), *popt_en))
+plt.show()
