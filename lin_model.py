@@ -42,6 +42,6 @@ popt_en, _ = curve_fit(x_t, (cs_en[0:5], cs_ru[0:5]), cs_en[1:6])
 a, b, y = popt_en
 
 plt.plot(np.arange(1, 6), x_t((cs_en[0:5], cs_ru[0:5]), *popt_en), 'r',  label = 'Fit linear model output')
-plt.plot(np.arange(6), cs_en, 'g--', label = 'Original data')
+plt.scatter(np.arange(6), cs_en, label = 'Original data')
 plt.legend()
 plt.show()
