@@ -4,8 +4,6 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
 
-# Исходные данные
-q = 40000 # Целевой показатель продаж
 # Загрузка начальных данных
 table_name = "SAPR.xlsx"
 table = pd.read_excel(table_name, skiprows = 2, header = None)
@@ -42,27 +40,37 @@ popt_en, _ = curve_fit(x_t, (cs_en[0:5], cs_ru[0:5]), cs_en[1:6])
 popt_ru, _ = curve_fit(x_t, (cs_ru[0:5], cs_en[0:5]), cs_ru[1:6])
 
 
-def fit_model(cs_1, cs_2, popt, t = 5):
-    cs_fit = 0
+def fit_model(cs_1, cs_2, popt_1, popt_2, t = 5):
+    cs1_fit = []
+    cs2_fit = []
+    a1, b1, y1 = popt_1
+    a2, b2, y2 = popt_2
+    cs_1, cs_2 = cs_1[0], cs_2[0]
 
-    return cs_fit
+    for i in range(t):
+        c1 = x_t((cs_1, cs_2), a1, b1, y1)
+        c2 = x_t((cs_2, cs_1), a2, b2, y2)
+        cs1_fit.append(c1)
+        cs2_fit.append(c2)
+        cs_1, cs_2 = c1, c2
+
+    return cs1_fit, cs2_fit
 
 
-def plt_fit(cs_1, cs_2, popt, title):
-    plt.plot(np.arange(1, 6), x_t((cs_1[0:5], cs_2[0:5]), *popt), 'r',  label = 'Fit linear model output')
+def plt_fit(cs_1, cs_2, popt_1, popt_2, title):
+    plt.plot(np.arange(1, 6), fit_model(cs_1, cs_2, popt_1, popt_2)[0], 'r',  label = 'Fit linear model output')
     plt.scatter(np.arange(6), cs_1, label = 'Original data')
     plt.title(label = title)
     plt.legend()
     plt.show()
 
 
-plt_fit(cs_en, cs_ru, popt_en, title = "Предсказание для иностранного ПО")
-plt_fit(cs_ru, cs_en, popt_ru, title = "Предсказание для отечественного ПО")
+plt_fit(cs_en, cs_ru, popt_en, popt_ru, title = "Предсказание для иностранного ПО")
+plt_fit(cs_ru, cs_en, popt_ru, popt_en, title = "Предсказание для отечественного ПО")
 
-# NOT CORRECT
-#___________________________________________________________
-cs_fit_en = x_t((cs_en[0:5], cs_ru[0:5]), *popt_en)
-cs_fit_ru = x_t((cs_ru[0:5], cs_en[0:5]), *popt_ru)
+
+cs_fit_en = fit_model(cs_en, cs_ru, popt_en, popt_ru)
+cs_fit_ru = fit_model(cs_ru, cs_en, popt_ru, popt_en)
 
 
 # Оценка относительной ошибки аппроксимации линейной модели
@@ -79,3 +87,7 @@ print("Относительная абсолютная ошибка для ап�
 
 
 # Предсказание линейной модели без субсидии
+_, prediction_ru = fit_model(cs_en, cs_ru, popt_en, popt_ru, t = 15)
+# Цель субсидии Q - увеличение продаж в 2030 году на 30 % в сравнении с прогнозом
+q = 1.30 * prediction_ru[-1] 
+print("Цель субсидии Q =", q)
