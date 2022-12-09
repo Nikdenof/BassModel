@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.optimize import curve_fit
+from scipy.optimize import curve_fit, minimize
 
 
 # Загрузка начальных данных
@@ -91,3 +91,89 @@ _, prediction_ru = fit_model(cs_en, cs_ru, popt_en, popt_ru, t = 15)
 # Цель субсидии Q - увеличение продаж в 2030 году на 30 % в сравнении с прогнозом
 q = 1.30 * prediction_ru[-1] 
 print("Цель субсидии Q =", q)
+
+# Определение субсидии
+
+# Есть цель Q, нужна ступенчатая функция для s.
+sub_start_ru = prediction_ru[4]
+t = 10
+
+
+def objective(s):
+    start = sub_start_ru
+    a, b, _ = popt_ru
+    x = []
+    for i in range(4):
+        s_t = s[0]
+        x_i = a - b * (start - s_t)
+        x.append(x_i)
+        start = x_i
+    for i in range(4, 7):
+        s_t = s[1]
+        x_i = a - b * (start - s_t)
+        x.append(x_i)
+        start = x_i
+    for i in range(7, t):
+        s_t = s[2]
+        x_i = a - b * (start - s_t)
+        x.append(x_i)
+        start = x_i
+    return x[-1]
+
+
+# Ограничение - результат должен быть равен Q 
+def constr1(s):
+    return objective(s) - q
+
+
+con1 = {'type': 'eq', 'fun': constr1}
+
+
+# Процесс оптимизации
+b = (0, 10000)
+bnds = (b, b, b)
+x0 = np.zeros(3) # предположительные значения субсидии s1, s2, s3
+sol = minimize(objective, x0 = x0, method = "SLSQP", bounds = bnds, constraints = con1)
+print(sol)
+
+
+# Вычисление погодового прогноза с учетом субсидии
+
+
+def sub_model(s):
+    start = sub_start_ru
+    a, b, _ = popt_ru
+    x = []
+    s_lst = []
+    for i in range(4):
+        s_t = s[0]
+        x_i = a - b * (start - s)
+        x.append(x_i)
+        s_lst.append(s_t)
+        start = x_i
+    for i in range(4, 7):
+        s_t = s[1]
+        x_i = a - b * (start - s_t)
+        x.append(x_i)
+        s_lst.append(s_t)
+        start = x_i
+    for i in range(7, t):
+        s_t = s[2]
+        x_i = a - b * (start - s_t)
+        x.append(x_i)
+        s_lst.append(s_t)
+        start = x_i
+    return x, s_lst
+
+# Сравнение изначального прогноза и результата субсидии
+plt.plot(np.arange(5, 15), sub_model(sol.x)[0], 'r',  label = 'Subsidy linear model prediction')
+plt.plot(np.arange(len(prediction_ru)), prediction_ru, label = 'Original prediction')
+# plt.title(label = title)
+plt.legend()
+plt.show()
+
+
+
+# Subsidy step change plot
+plt.step(np.arange(10), sub_model(sol.x)[1])
+plt.show()
