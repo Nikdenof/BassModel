@@ -138,8 +138,6 @@ print(sol)
 
 
 # Вычисление погодового прогноза с учетом субсидии
-
-
 def sub_model(s):
     start = sub_start_ru
     a, b, _ = popt_ru
@@ -147,7 +145,7 @@ def sub_model(s):
     s_lst = []
     for i in range(4):
         s_t = s[0]
-        x_i = a - b * (start - s)
+        x_i = a - b * (start - s_t)
         x.append(x_i)
         s_lst.append(s_t)
         start = x_i
@@ -165,6 +163,7 @@ def sub_model(s):
         start = x_i
     return x, s_lst
 
+
 # Сравнение изначального прогноза и результата субсидии
 plt.plot(np.arange(5, 15), sub_model(sol.x)[0], 'r',  label = 'Subsidy linear model prediction')
 plt.plot(np.arange(len(prediction_ru)), prediction_ru, label = 'Original prediction')
@@ -173,7 +172,7 @@ plt.legend()
 plt.show()
 
 
-
 # Subsidy step change plot
 plt.step(np.arange(10), sub_model(sol.x)[1])
+plt.title(label = "Измение размера субсидии в период ее действия")
 plt.show()
