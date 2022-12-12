@@ -69,8 +69,8 @@ plt_fit(cs_en, cs_ru, popt_en, popt_ru, title = "Предсказание для
 plt_fit(cs_ru, cs_en, popt_ru, popt_en, title = "Предсказание для отечественного ПО")
 
 
-cs_fit_en = fit_model(cs_en, cs_ru, popt_en, popt_ru)
-cs_fit_ru = fit_model(cs_ru, cs_en, popt_ru, popt_en)
+cs_fit_en = fit_model(cs_en, cs_ru, popt_en, popt_ru)[0]
+cs_fit_ru = fit_model(cs_ru, cs_en, popt_ru, popt_en)[0]
 
 
 # Оценка относительной ошибки аппроксимации линейной модели
@@ -87,7 +87,7 @@ print("Относительная абсолютная ошибка для ап�
 
 
 # Предсказание линейной модели без субсидии
-_, prediction_ru = fit_model(cs_en, cs_ru, popt_en, popt_ru, t = 15)
+prediction_en, prediction_ru = fit_model(cs_en, cs_ru, popt_en, popt_ru, t = 15)
 # Цель субсидии Q - увеличение продаж в 2030 году на 30 % в сравнении с прогнозом
 q = 1.30 * prediction_ru[-1] 
 print("Цель субсидии Q =", q)
@@ -96,72 +96,84 @@ print("Цель субсидии Q =", q)
 
 # Есть цель Q, нужна ступенчатая функция для s.
 sub_start_ru = prediction_ru[4]
+sub_start_en = prediction_en[4]
 t = 10
 
 
 def objective(s):
-    start = sub_start_ru
-    a, b, _ = popt_ru
-    x = []
-    for i in range(4):
-        s_t = s[0]
-        x_i = a - b * (start - s_t)
-        x.append(x_i)
-        start = x_i
-    for i in range(4, 7):
-        s_t = s[1]
-        x_i = a - b * (start - s_t)
-        x.append(x_i)
-        start = x_i
-    for i in range(7, t):
-        s_t = s[2]
-        x_i = a - b * (start - s_t)
-        x.append(x_i)
-        start = x_i
-    return x[-1]
+    start_ru = sub_start_ru
+    start_en = sub_start_en
+    a1, b1, y1 = popt_ru
+    a2, b2, y2 = popt_en
+    x1 = []
+    x2 = []
+    s_t = s[0]
+    for i in range(t):
+        if i == 4:
+            s_t = s[1]
+        elif i == 7:
+            s_t = s[2]
+        x1_i = a1 - b1 * (start_ru - s_t) + y1 * start_en
+        x2_i = a2 - b2 * start_en + y2 * (start_ru - s_t)
+        x1.append(x1_i)
+        x2.append(x2_i)
+        start_ru = x1_i
+        start_en = x2_i
+    return x1[-1]
 
 
 # Ограничение - результат должен быть равен Q 
 def constr1(s):
     return objective(s) - q
 
+def constr2(s):
+    return s[0]
+
+def constr3(s):
+    return s[1]
+ 
+def constr4(s):
+    return s[2]
+
 
 con1 = {'type': 'eq', 'fun': constr1}
+con2 = {'type': 'lq', 'fun': constr2}
+con3 = {'type': 'lq', 'fun': constr3}
+con4 = {'type': 'lq', 'fun': constr4}
 
 
 # Процесс оптимизации
-b = (0, 10000)
+b = (0, 100000)
 bnds = (b, b, b)
 x0 = np.zeros(3) # предположительные значения субсидии s1, s2, s3
-sol = minimize(objective, x0 = x0, method = "SLSQP", bounds = bnds, constraints = con1)
+x0[0], x0[1], x0[2] = 50000, 35000, 20000
+sol = minimize(objective, x0 = x0, method = "CG", bounds = bnds, constraints = con1)
 print(sol)
 
 
 # Вычисление погодового прогноза с учетом субсидии
 def sub_model(s):
-    start = sub_start_ru
-    a, b, _ = popt_ru
-    x = []
+    start_ru = sub_start_ru
+    start_en = sub_start_en
+    a1, b1, y1 = popt_ru
+    a2, b2, y2 = popt_en
+    x1 = []
+    x2 = []
     s_lst = []
-    for i in range(4):
-        s_t = s[0]
-        x_i = a - b * (start - s_t)
-        x.append(x_i)
+    s_t = s[0]
+    for i in range(t):
+        if i == 4:
+            s_t = s[1]
+        elif i == 7:
+            s_t = s[2]
+        x1_i = a1 - b1 * (start_ru - s_t) + y1 * start_en
+        x2_i = a2 - b2 * start_en + y2 * (start_ru - s_t)
+        x1.append(x1_i)
+        x2.append(x2_i)
         s_lst.append(s_t)
-        start = x_i
-    for i in range(4, 7):
-        s_t = s[1]
-        x_i = a - b * (start - s_t)
-        x.append(x_i)
-        s_lst.append(s_t)
-        start = x_i
-    for i in range(7, t):
-        s_t = s[2]
-        x_i = a - b * (start - s_t)
-        x.append(x_i)
-        s_lst.append(s_t)
-        start = x_i
-    return x, s_lst
+        start_ru = x1_i
+        start_en = x2_i
+    return x1, s_lst
 
 
 # Сравнение изначального прогноза и результата субсидии
