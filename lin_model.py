@@ -28,7 +28,7 @@ cad_en, cs_en = cum_sum_add(cad_en)
 cad_ru, cs_ru = cum_sum_add(cad_ru)
 cad_sum, cs_sum = cum_sum_add(cad_sum)
 
-n1 = 4000000 #4_000_000
+n1 = 65000 #4_000_000
 n2 = n1
 
 
@@ -155,10 +155,12 @@ con4 = {'type': 'lq', 'fun': constr4}
 # Процесс оптимизации
 methods_yak = ['Newton-CG', 'dogleg', 'trust-ncg', 'trust-exact', 'trust-krylov']
 methods = ['Nelder-Mead', 'Powell', 'CG', 'BFGS', 'L-BFGS-B', 'TNC', 'COBYLA', 'SLSQP', 'trust-constr']
-b = (0, 100000)
-bnds = (b, b, b)
+b1 = (0, 8000)
+b2 = (0, 8000)
+b3 = (0, 8000)
+bnds = (b1, b2, b3)
 x0 = np.zeros(3) # предположительные значения субсидии s1, s2, s3
-x0[0], x0[1], x0[2] = 50000, 35000, 20000
+x0[0], x0[1], x0[2] = 5000, 3500, 2000
 sol = minimize(objective, x0 = x0, method = methods[8], bounds = bnds, constraints = con1)
 print(sol)
 
