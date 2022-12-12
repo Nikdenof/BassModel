@@ -28,7 +28,8 @@ cad_en, cs_en = cum_sum_add(cad_en)
 cad_ru, cs_ru = cum_sum_add(cad_ru)
 cad_sum, cs_sum = cum_sum_add(cad_sum)
 
-n1 = 65000 #4_000_000
+# Задаем коэффициенты эта, которые характеризуют цену продукции
+n1 = 65000 
 n2 = n1
 
 
@@ -39,10 +40,14 @@ def x_t(X, a, b, y):
     #return a - b * x1 + y * x2 
 
 
-popt_en, _ = curve_fit(x_t, (cs_en[0:5], cs_ru[0:5]), cs_en[1:6])
-popt_ru, _ = curve_fit(x_t, (cs_ru[0:5], cs_en[0:5]), cs_ru[1:6])
+# Ограничиваем диапазон для коэффициентов (>0) 
+b = (0.001, 100000)
+bounds = (b, b, b)
+popt_en, _ = curve_fit(x_t, (cs_en[0:5], cs_ru[0:5]), cs_en[1:6], bounds = b)
+popt_ru, _ = curve_fit(x_t, (cs_ru[0:5], cs_en[0:5]), cs_ru[1:6], bounds = b)
 
 
+# Определяем аппроксимирующую модель
 def fit_model(cs_1, cs_2, popt_1, popt_2, t = 5):
     cs1_fit = []
     cs2_fit = []
@@ -61,8 +66,8 @@ def fit_model(cs_1, cs_2, popt_1, popt_2, t = 5):
 
 
 def plt_fit(cs_1, cs_2, popt_1, popt_2, title):
-    plt.plot(np.arange(1, 6), fit_model(cs_1, cs_2, popt_1, popt_2)[0], 'r',  label = 'Fit linear model output')
-    plt.scatter(np.arange(6), cs_1, label = 'Original data')
+    plt.plot(np.arange(1, 6), fit_model(cs_1, cs_2, popt_1, popt_2)[0], 'r',  label = 'Выходные данные модели')
+    plt.scatter(np.arange(6), cs_1, label = 'Исходные данные')
     plt.title(label = title)
     plt.legend()
     plt.show()
@@ -136,33 +141,20 @@ def objective(s):
 def constr1(s):
     return objective(s) - q
 
-def constr2(s):
-    return s[0]
-
-def constr3(s):
-    return s[1]
- 
-def constr4(s):
-    return s[2]
-
 
 con1 = {'type': 'eq', 'fun': constr1}
-con2 = {'type': 'lq', 'fun': constr2}
-con3 = {'type': 'lq', 'fun': constr3}
-con4 = {'type': 'lq', 'fun': constr4}
-
 
 # Процесс оптимизации
 methods_yak = ['Newton-CG', 'dogleg', 'trust-ncg', 'trust-exact', 'trust-krylov']
 methods = ['Nelder-Mead', 'Powell', 'CG', 'BFGS', 'L-BFGS-B', 'TNC', 'COBYLA', 'SLSQP', 'trust-constr']
-b1 = (0, 8000)
-b2 = (0, 8000)
-b3 = (0, 8000)
+b1 = (0, 800)
+b2 = (0, 800)
+b3 = (0, 800)
 bnds = (b1, b2, b3)
 x0 = np.zeros(3) # предположительные значения субсидии s1, s2, s3
 x0[0], x0[1], x0[2] = 5000, 3500, 2000
 sol = minimize(objective, x0 = x0, method = methods[8], bounds = bnds, constraints = con1)
-print(sol)
+print(sol) # Печатаем результат с оценкой работы оптимизатора
 
 
 # Вычисление погодового прогноза с учетом субсидии
@@ -195,7 +187,6 @@ plt.plot(np.arange(len(prediction_ru)), prediction_ru, label = 'Original predict
 # plt.title(label = title)
 plt.legend()
 plt.show()
-
 
 # Subsidy step change plot
 plt.step(np.arange(10), sub_model(sol.x)[1])
