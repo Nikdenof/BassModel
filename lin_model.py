@@ -28,12 +28,15 @@ cad_en, cs_en = cum_sum_add(cad_en)
 cad_ru, cs_ru = cum_sum_add(cad_ru)
 cad_sum, cs_sum = cum_sum_add(cad_sum)
 
+n1 = 4000000 #4_000_000
+n2 = n1
+
 
 # Получение коэффициентов линейной модели спроса
 def x_t(X, a, b, y):
     x1, x2 = X # Кумулятивные продажи первого и второго продукта
-    # return a - b * (n1 - x1) + y * (n2 - x2) 
-    return a - b * x1 + y * x2 
+    return a - b * (n1 - x1) + y * (n2 - x2) 
+    #return a - b * x1 + y * x2 
 
 
 popt_en, _ = curve_fit(x_t, (cs_en[0:5], cs_ru[0:5]), cs_en[1:6])
@@ -100,6 +103,14 @@ sub_start_en = prediction_en[4]
 t = 10
 
 
+def calc_x(start_ru, start_en, s_t):
+    a1, b1, y1 = popt_ru
+    a2, b2, y2 = popt_en
+    x1_i = a1 - b1 * (n1 - start_ru - s_t) + y1 * (n2 - start_en)
+    x2_i = a2 - b2 * (n2 - start_en) + y2 * (n1 - start_ru - s_t)
+    return x1_i, x2_i
+
+
 def objective(s):
     start_ru = sub_start_ru
     start_en = sub_start_en
@@ -113,8 +124,7 @@ def objective(s):
             s_t = s[1]
         elif i == 7:
             s_t = s[2]
-        x1_i = a1 - b1 * (start_ru - s_t) + y1 * start_en
-        x2_i = a2 - b2 * start_en + y2 * (start_ru - s_t)
+        x1_i, x2_i = calc_x(start_ru, start_en, s_t)
         x1.append(x1_i)
         x2.append(x2_i)
         start_ru = x1_i
@@ -143,11 +153,13 @@ con4 = {'type': 'lq', 'fun': constr4}
 
 
 # Процесс оптимизации
+methods_yak = ['Newton-CG', 'dogleg', 'trust-ncg', 'trust-exact', 'trust-krylov']
+methods = ['Nelder-Mead', 'Powell', 'CG', 'BFGS', 'L-BFGS-B', 'TNC', 'COBYLA', 'SLSQP', 'trust-constr']
 b = (0, 100000)
 bnds = (b, b, b)
 x0 = np.zeros(3) # предположительные значения субсидии s1, s2, s3
 x0[0], x0[1], x0[2] = 50000, 35000, 20000
-sol = minimize(objective, x0 = x0, method = "CG", bounds = bnds, constraints = con1)
+sol = minimize(objective, x0 = x0, method = methods[8], bounds = bnds, constraints = con1)
 print(sol)
 
 
@@ -166,8 +178,7 @@ def sub_model(s):
             s_t = s[1]
         elif i == 7:
             s_t = s[2]
-        x1_i = a1 - b1 * (start_ru - s_t) + y1 * start_en
-        x2_i = a2 - b2 * start_en + y2 * (start_ru - s_t)
+        x1_i, x2_i = calc_x(start_ru, start_en, s_t)
         x1.append(x1_i)
         x2.append(x2_i)
         s_lst.append(s_t)
