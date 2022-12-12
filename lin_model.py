@@ -182,8 +182,8 @@ def sub_model(s):
 
 
 # Сравнение изначального прогноза и результата субсидии
-plt.plot(np.arange(5, 15), sub_model(sol.x)[0], 'r',  label = 'Subsidy linear model prediction')
-plt.plot(np.arange(len(prediction_ru)), prediction_ru, label = 'Original prediction')
+plt.plot(np.arange(5, 15), sub_model(sol.x)[0], 'r',  label = 'Выходные данные модели с учетом субсидии')
+plt.plot(np.arange(len(prediction_ru)), prediction_ru, label = 'Выходные данные модели без учета субсидии')
 # plt.title(label = title)
 plt.legend()
 plt.show()
