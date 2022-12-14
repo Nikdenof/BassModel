@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit, minimize
 
-np.
 
 # Загрузка начальных данных
 table_name = "SAPR.xlsx"
@@ -44,8 +43,8 @@ def x_t(X, a, b, y):
 # Ограничиваем диапазон для коэффициентов (>0) 
 b = (0.001, 100000)
 bounds = (b, b, b)
-popt_en, _ = curve_fit(x_t, (cs_en[0:5], cs_ru[0:5]), cs_en[1:6], bounds = b)
-popt_ru, _ = curve_fit(x_t, (cs_ru[0:5], cs_en[0:5]), cs_ru[1:6], bounds = b)
+popt_en, _ = curve_fit(x_t, (cs_en[0:3], cs_ru[0:3]), cs_en[1:4], bounds = b)
+popt_ru, _ = curve_fit(x_t, (cs_ru[0:3], cs_en[0:3]), cs_ru[1:4], bounds = b)
 
 
 # Определяем аппроксимирующую модель
@@ -67,7 +66,7 @@ def fit_model(cs_1, cs_2, popt_1, popt_2, t = 5):
 
 
 def plt_fit(cs_1, cs_2, popt_1, popt_2, title):
-    plt.plot(np.arange(1, 6), fit_model(cs_1, cs_2, popt_1, popt_2)[0], 'r',  label = 'Выходные данные модели')
+    plt.plot(np.arange(4, 6), fit_model(cs_1, cs_2, popt_1, popt_2)[0][3:], 'r',  label = 'Выходные данные модели')
     plt.scatter(np.arange(6), cs_1, label = 'Исходные данные')
     plt.title(label = title)
     plt.legend()
@@ -91,8 +90,8 @@ def rae(cs_fit, cs):
 
     return rae
 
-print("Относительная абсолютная ошибка для аппроксимации данных продаж иностанного ПО =", rae(cs_fit_en, cs_en[1:]))
-print("Относительная абсолютная ошибка для аппроксимации данных продаж отечественного ПО =", rae(cs_fit_ru, cs_ru[1:]))
+print("Относительная абсолютная ошибка для аппроксимации данных продаж иностанного ПО =", rae(cs_fit_en[3:], cs_en[4:]))
+print("Относительная абсолютная ошибка для аппроксимации данных продаж отечественного ПО =", rae(cs_fit_ru[3:], cs_ru[4:]))
 
 
 # Предсказание линейной модели без субсидии
