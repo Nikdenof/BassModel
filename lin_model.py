@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit, minimize
 
+np.
 
 # Загрузка начальных данных
 table_name = "SAPR.xlsx"
@@ -18,7 +19,7 @@ cad_sum = table[["Years", "Sum"]].copy()
 
 # Выделяем столбец кумулятивной суммы
 def cum_sum_add(df):
-    df = df.rename(columns={ df.columns[1]: "revenues" })
+    df = df.rename(columns={df.columns[1]: "revenues"})
     df['cum_sum'] = df['revenues'].cumsum()
     arr = df['revenues'].cumsum().values
     return df, arr
@@ -29,7 +30,7 @@ cad_ru, cs_ru = cum_sum_add(cad_ru)
 cad_sum, cs_sum = cum_sum_add(cad_sum)
 
 # Задаем коэффициенты эта, которые характеризуют цену продукции
-n1 = 65000 
+n1 = 65000
 n2 = n1
 
 
@@ -97,7 +98,7 @@ print("Относительная абсолютная ошибка для ап�
 # Предсказание линейной модели без субсидии
 prediction_en, prediction_ru = fit_model(cs_en, cs_ru, popt_en, popt_ru, t = 15)
 # Цель субсидии Q - увеличение продаж в 2030 году на 30 % в сравнении с прогнозом
-q = 1.30 * prediction_ru[-1] 
+q = 1.30 * prediction_ru[-1]
 print("Цель субсидии Q =", q)
 
 # Определение субсидии
