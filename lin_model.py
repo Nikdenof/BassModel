@@ -37,7 +37,6 @@ n2 = n1
 def x_t(X, a, b, y):
     x1, x2 = X # Кумулятивные продажи первого и второго продукта
     return a - b * (n1 - x1) + y * (n2 - x2) 
-    #return a - b * x1 + y * x2 
 
 
 # Ограничиваем диапазон для коэффициентов (>0) 
@@ -65,16 +64,19 @@ def fit_model(cs_1, cs_2, popt_1, popt_2, t = 5):
     return cs1_fit, cs2_fit
 
 
-def plt_fit(cs_1, cs_2, popt_1, popt_2, title):
-    plt.plot(np.arange(4, 6), fit_model(cs_1, cs_2, popt_1, popt_2)[0][3:], 'r',  label = 'Выходные данные модели')
+def plt_fit(cs_1, cs_2, popt_1, popt_2, title, save):
+    plt.plot(np.arange(4, 6), fit_model(cs_1, cs_2, popt_1, popt_2)[0][3:], 'r',  label = 'Предсказания модели')
+    plt.plot(np.arange(1, 5), fit_model(cs_1, cs_2, popt_1, popt_2)[0][:4], 'g--',  label = 'Аппроксимация модели')
+    plt.plot(np.arange(2), [cs_1[0], fit_model(cs_1, cs_2, popt_1, popt_2)[0][0]], 'g--')
     plt.scatter(np.arange(6), cs_1, label = 'Исходные данные')
     plt.title(label = title)
     plt.legend()
+    plt.savefig(save)
     plt.show()
 
 
-plt_fit(cs_en, cs_ru, popt_en, popt_ru, title = "Предсказание для иностранного ПО")
-plt_fit(cs_ru, cs_en, popt_ru, popt_en, title = "Предсказание для отечественного ПО")
+plt_fit(cs_en, cs_ru, popt_en, popt_ru, title = "Предсказание для иностранного ПО", save = 'foreign_pred.png')
+plt_fit(cs_ru, cs_en, popt_ru, popt_en, title = "Предсказание для отечественного ПО", save = 'domestic_pred.png')
 
 
 cs_fit_en = fit_model(cs_en, cs_ru, popt_en, popt_ru)[0]
@@ -185,11 +187,13 @@ def sub_model(s):
 plt.plot(np.arange(5, 15), sub_model(sol.x)[0], 'r',  label = 'Выходные данные модели с учетом субсидии')
 plt.plot(np.arange(len(prediction_ru)), prediction_ru, label = 'Выходные данные модели без учета субсидии')
 plt.plot(len(prediction_ru) - 1, q, marker="o", markersize=10, markeredgecolor="red", markerfacecolor="green", label = "Цель субсидии Q") 
-# plt.title(label = title)
+plt.title(label = 'Сравнение изначального прогноза и результата субсидии')
 plt.legend()
+plt.savefig('sub_res.png')
 plt.show()
 
 # Subsidy step change plot
 plt.step(np.arange(10), sub_model(sol.x)[1])
 plt.title(label = "Измение размера субсидии в период ее действия")
+plt.savefig('sub_step.png')
 plt.show()
