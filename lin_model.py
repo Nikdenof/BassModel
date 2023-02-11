@@ -65,8 +65,8 @@ def fit_model(cs_1, cs_2, popt_1, popt_2, t = 5):
 
 
 def plt_fit(cs_1, cs_2, popt_1, popt_2, title, save):
-    plt.plot(np.arange(4, 6), fit_model(cs_1, cs_2, popt_1, popt_2)[0][3:], 'r',  label = 'Предсказания модели')
-    plt.plot(np.arange(1, 5), fit_model(cs_1, cs_2, popt_1, popt_2)[0][:4], 'g--',  label = 'Аппроксимация модели')
+    plt.plot(np.arange(3, 6), fit_model(cs_1, cs_2, popt_1, popt_2)[0][2:], 'r',  label = 'Предсказания модели')
+    plt.plot(np.arange(1, 4), fit_model(cs_1, cs_2, popt_1, popt_2)[0][:3], 'g--',  label = 'Аппроксимация модели')
     plt.plot(np.arange(2), [cs_1[0], fit_model(cs_1, cs_2, popt_1, popt_2)[0][0]], 'g--')
     plt.scatter(np.arange(6), cs_1, label = 'Исходные данные')
     plt.title(label = title)
