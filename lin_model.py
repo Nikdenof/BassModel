@@ -95,7 +95,6 @@ def rae(cs_fit, cs):
 print("Относительная абсолютная ошибка для аппроксимации данных продаж иностанного ПО =", rae(cs_fit_en[3:], cs_en[4:]))
 print("Относительная абсолютная ошибка для аппроксимации данных продаж отечественного ПО =", rae(cs_fit_ru[3:], cs_ru[4:]))
 
-
 # Предсказание линейной модели без субсидии
 prediction_en, prediction_ru = fit_model(cs_en, cs_ru, popt_en, popt_ru, t = 15)
 # Цель субсидии Q - увеличение продаж в 2030 году на 30 % в сравнении с прогнозом
@@ -125,6 +124,7 @@ def objective(s):
     a2, b2, y2 = popt_en
     x1 = []
     x2 = []
+    s_lst = []
     s_t = s[0]
     for i in range(t):
         if i == 4:
@@ -134,28 +134,62 @@ def objective(s):
         x1_i, x2_i = calc_x(start_ru, start_en, s_t)
         x1.append(x1_i)
         x2.append(x2_i)
+        s_lst.append(s_t)
+        start_ru = x1_i
+        start_en = x2_i
+    return sum(s_lst)
+
+def sub_model(s):
+    start_ru = sub_start_ru
+    start_en = sub_start_en
+    a1, b1, y1 = popt_ru
+    a2, b2, y2 = popt_en
+    x1 = []
+    x2 = []
+    s_lst = []
+    s_t = s[0]
+    for i in range(t):
+        if i == 4:
+            s_t = s[1]
+        elif i == 7:
+            s_t = s[2]
+        x1_i, x2_i = calc_x(start_ru, start_en, s_t)
+        x1.append(x1_i)
+        x2.append(x2_i)
+        s_lst.append(s_t)
         start_ru = x1_i
         start_en = x2_i
     return x1[-1]
 
-
 # Ограничение - результат должен быть равен Q 
 def constr1(s):
-    return objective(s) - q
+    return sub_model(s) - q
+
+def constr2(s):
+    return s[1] - s[0]*1.1
+
+def constr3(s):
+    return s[2] - s[1]*1.1
 
 
 con1 = {'type': 'eq', 'fun': constr1}
 
+con2 = {'type': 'ineq', 'fun': constr2}
+
+con3 = {'type': 'ineq', 'fun': constr3}
+
+cons = [con1, con2, con3]
+
 # Процесс оптимизации
 methods_yak = ['Newton-CG', 'dogleg', 'trust-ncg', 'trust-exact', 'trust-krylov']
 methods = ['Nelder-Mead', 'Powell', 'CG', 'BFGS', 'L-BFGS-B', 'TNC', 'COBYLA', 'SLSQP', 'trust-constr']
-b1 = (0, 800)
-b2 = (0, 800)
-b3 = (0, 800)
+b1 = (0, 350)
+b2 = (0, 350)
+b3 = (0, 350)
 bnds = (b1, b2, b3)
 x0 = np.zeros(3) # предположительные значения субсидии s1, s2, s3
-x0[0], x0[1], x0[2] = 5000, 3500, 2000
-sol = minimize(objective, x0 = x0, method = methods[8], bounds = bnds, constraints = con1)
+x0[0], x0[1], x0[2] = 150, 200, 350
+sol = minimize(objective, x0 = x0, method = methods[8], bounds = bnds, constraints = cons)
 print(sol) # Печатаем результат с оценкой работы оптимизатора
 
 
@@ -197,3 +231,4 @@ plt.step(np.arange(10), sub_model(sol.x)[1])
 plt.title(label = "Измение размера субсидии в период ее действия")
 plt.savefig('sub_step.png')
 plt.show()
+
