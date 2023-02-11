@@ -1,0 +1,5 @@
+# The thing that we need to ignore in this project are:
+# Images
+*.jpg
+*.png
+
