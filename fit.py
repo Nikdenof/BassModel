@@ -65,5 +65,5 @@ prediction_en, prediction_ru = fit_model(cs_en, cs_ru, popt_en, popt_ru, t = 15)
 
 np.savetxt("outputs/base_prediction_ru.csv", prediction_ru, delimiter=",")
 np.savetxt("outputs/base_prediction_en.csv", prediction_en, delimiter=",")
-np.savetxt("outputs/coef_ru", popt_ru, delimiter=",")
-np.savetxt("outputs/coef_en", popt_en, delimiter=",")
+np.savetxt("outputs/coef_ru.csv", popt_ru, delimiter=",")
+np.savetxt("outputs/coef_en.csv", popt_en, delimiter=",")

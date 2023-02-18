@@ -7,8 +7,8 @@ n2 = n1 # Коэффициенты эта, характеризующие цен
 
 prediction_ru = np.genfromtxt("outputs/base_prediction_ru.csv", delimiter=",")
 prediction_en = np.genfromtxt("outputs/base_prediction_en.csv", delimiter=",")
-coefficients_ru = np.genfromtxt("outputs/coef_ru", delimiter=",")
-coefficients_en = np.genfromtxt("outputs/coef_en", delimiter=",")
+coefficients_ru = np.genfromtxt("outputs/coef_ru.csv", delimiter=",")
+coefficients_en = np.genfromtxt("outputs/coef_en.csv", delimiter=",")
 # Цель субсидии Q - увеличение продаж в 2030 году на 30 % в сравнении с прогнозом
 q = 1.30 * prediction_ru[-1]
 print("Цель субсидии Q =", q)
