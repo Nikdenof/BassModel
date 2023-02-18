@@ -29,5 +29,5 @@ def cumsum_add(df_mod):
     return arr
 
 
-np.savetxt("sales_en.csv", cumsum_add(cad_en), delimiter=",")
-np.savetxt("sales_ru.csv", cumsum_add(cad_ru), delimiter=",")
+np.savetxt("outputs/sales_en.csv", cumsum_add(cad_en), delimiter=",")
+np.savetxt("outputs/sales_ru.csv", cumsum_add(cad_ru), delimiter=",")
