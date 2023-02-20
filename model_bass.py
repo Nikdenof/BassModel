@@ -1,4 +1,6 @@
+import numpy as np
 from scipy.optimize import curve_fit 
+from plots import fit_plt
 
 class BassModel:
     def __init__(self, base_cumsum, base_sum, competetor_cumsum, competetor_sum):
@@ -27,17 +29,31 @@ class BassModel:
         """
         return p * m + (q - p) * x - (q / m) * x ** 2
 
-    def fit(self, visualize=False, num_iterations=5000):
+    def fit(self, num_iterations=5000):
         """
         This functions performes curve_fit function from the scipy module
         in order to find the coefficients of the bass function.
         Returns an array of size equal to the number of coefficients
         """
+        #####
+        ##### CHANGE TO 4 points
         fit_coefficients, _ = curve_fit(self.bass_function, self.base_cumsum[0:5], self.base_sum[1:6], maxfev=num_iterations)
-        self.coeff_m, self.coeff_q, self.coeff_p = fit_coefficients
-        if visualize:
-            print('test')
+        self.coeff_p, self.coeff_q, self.coeff_m = fit_coefficients
         return fit_coefficients
 
+    def calc_prediction(self, num_years, start_value=0, visualize=False):
+        """ Calculates prediction based on computed coefficients, returns an array, containing cummulitive sum of bass function"""
+        cum_sum = [start_value]
+        for t in range(num_years):
+            running_sum = self.bass_function(cum_sum[t], self.coeff_p, self.coeff_q, self.coeff_m)
+            running_cumsum = cum_sum[t] + running_sum
+            cum_sum.append(running_cumsum)
+        self.fit_predict = cum_sum
+        if visualize:
+            fit_plt(self.base_cumsum, self.fit_predict, title="Sasik", save="outputs/test.png")
+        return cum_sum
+
+    def calc_err(self):
+        pass
     def minimize(self, visualize=False):
         pass
