@@ -13,7 +13,7 @@ avg_price_start = (start_ru_price + en_price) / 2 # Начальная сред�
 avg_price_end = (ru_price + en_price) / 2 # Конечная средняя цена ПО
 
 # Загрузка начальных данных
-table_name = "SAPR.xlsx"
+table_name = "../SAPR.xlsx"
 table = pd.read_excel(table_name, skiprows = 2, header = None)
 table = table.transpose()[1:]
 table.columns = ["Foreign", "Domestic", "Sum"]

@@ -14,16 +14,24 @@ from plots import fit_plt
 
 
 # Начальные данные
-cs_en = np.genfromtxt('outputs/sales_en.csv', delimiter=',') 
-cs_ru = np.genfromtxt('outputs/sales_ru.csv', delimiter=',') 
-n1 = 65000 
-n2 = n1 # Коэффициенты эта, характеризующие цену продукции
+MODEL = "Linear"
+# MODEL = "Bass"
+_, cs_en = np.genfromtxt('outputs/sales_en.csv', delimiter=',') 
+_, cs_ru = np.genfromtxt('outputs/sales_ru.csv', delimiter=',') 
+n1 = n2 = 65000
 
 
 # Получение коэффициентов линейной модели спроса
-def x_t(X, a, b, y):
-    x1, x2 = X # Кумулятивные продажи первого и второго продукта
-    return a - b * (n1 - x1) + y * (n2 - x2) 
+if MODEL == "Linear":
+    def x_t(X, a, b, y):
+        x1, x2 = X # Кумулятивные продажи первого и второго продукта
+        return a - b * (n1 - x1) + y * (n2 - x2) 
+elif MODEL == "Bass":
+    def x_t(X, a, b, y):
+        x1, x2 = X # Кумулятивные продажи первого и второго продукта
+        return a - b * (n1 - x1) + y * (n2 - x2) 
+else:
+    raise Exception("Нет моделей с таким названием")
 
 
 # Ограничиваем диапазон для коэффициентов (>0) 

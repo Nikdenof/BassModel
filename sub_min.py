@@ -91,8 +91,6 @@ options = {"maxiter": 5000}
 sol = minimize(objective, x0 = x0, method = methods[8], bounds = bnds, constraints = cons, options=options)
 print(sol) # Печатаем результат с оценкой работы оптимизатора
 
-
-
 # Сравнение изначального прогноза и результата субсидии
 plt.plot(np.arange(5, 15), lin_model(sol.x)[0], 'r',  label = 'Выходные данные модели с учетом субсидии')
 plt.plot(np.arange(len(prediction_ru)), prediction_ru, label = 'Выходные данные модели без учета субсидии')
