@@ -19,16 +19,6 @@ class BassModel:
         """
         return p * m + (q - p) * x - (q / m) * x ** 2
 
-    @staticmethod
-    def bass_function_modified(x, p, q, m):
-        """
-        This is a modified bass function that has 3 parameters:
-            m - the number of people estimated to eventually adopt the new product
-            q - the coefficient of imitation
-            p - the coefficient of innovation
-        """
-        return p * m + (q - p) * x - (q / m) * x ** 2
-
     def fit(self, num_iterations=5000):
         """
         This functions performes curve_fit function from the scipy module
@@ -41,19 +31,19 @@ class BassModel:
         self.coeff_p, self.coeff_q, self.coeff_m = fit_coefficients
         return fit_coefficients
 
-    def calc_prediction(self, num_years, start_value=0, visualize=False):
-        """ Calculates prediction based on computed coefficients, returns an array, containing cummulitive sum of bass function"""
-        cum_sum = [start_value]
-        for t in range(num_years):
-            running_sum = self.bass_function(cum_sum[t], self.coeff_p, self.coeff_q, self.coeff_m)
-            running_cumsum = cum_sum[t] + running_sum
-            cum_sum.append(running_cumsum)
-        self.fit_predict = cum_sum
-        if visualize:
-            fit_plt(self.base_cumsum, self.fit_predict, title="Sasik", save="outputs/test.png")
-        return cum_sum
-
-    def calc_err(self):
-        pass
-    def minimize(self, visualize=False):
-        pass
+#    def calc_prediction(self, num_years, start_value=0, visualize=False):
+#        """ Calculates prediction based on computed coefficients, returns an array, containing cummulitive sum of bass function"""
+#        cum_sum = [start_value]
+#        for t in range(num_years):
+#            running_sum = self.bass_function(cum_sum[t], self.coeff_p, self.coeff_q, self.coeff_m)
+#            running_cumsum = cum_sum[t] + running_sum
+#            cum_sum.append(running_cumsum)
+#        self.fit_predict = cum_sum
+#        if visualize:
+#            fit_plt(self.base_cumsum, self.fit_predict, title="Sasik", save="outputs/test.png")
+#        return cum_sum
+#
+#    def calc_err(self):
+#        pass
+#    def minimize(self, visualize=False):
+#        pass
