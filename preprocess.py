@@ -3,6 +3,7 @@
 преобразует в формат csv, который можно подгрузить используя
 функции numpy или pandas
 """
+import os
 import pandas as pd
 import numpy as np
 
@@ -30,5 +31,6 @@ def cumsum_add(df_mod):
     return arr
 
 
+os.makedirs("outputs/", exist_ok=True)
 np.savetxt("outputs/sales_en.csv", cumsum_add(cad_en), delimiter=",")
 np.savetxt("outputs/sales_ru.csv", cumsum_add(cad_ru), delimiter=",")
