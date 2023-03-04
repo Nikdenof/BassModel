@@ -9,8 +9,11 @@ import numpy as np
 
 
 # Загрузка начальных данных
-TABLE_NAME = "SAPR.xlsx"
-table = pd.read_excel(TABLE_NAME, skiprows = 2, header = None)
+RAW_DATA= "SAPR.xlsx"
+RAW_DATA_DIR = "data/raw/"
+PROCESSED_DIR = "data/processed/"
+
+table = pd.read_excel(RAW_DATA_DIR+RAW_DATA, skiprows = 2, header = None)
 table = table.transpose()[1:]
 table.columns = ["Foreign", "Domestic", "Sum"]
 table["Years"] = table.index
@@ -31,6 +34,6 @@ def cumsum_add(df_mod):
     return arr
 
 
-os.makedirs("outputs/", exist_ok=True)
-np.savetxt("outputs/sales_en.csv", cumsum_add(cad_en), delimiter=",")
-np.savetxt("outputs/sales_ru.csv", cumsum_add(cad_ru), delimiter=",")
+os.makedirs(PROCESSED_DIR, exist_ok=True)
+np.savetxt(PROCESSED_DIR+"sales_en.csv", cumsum_add(cad_en), delimiter=",")
+np.savetxt(PROCESSED_DIR+"sales_ru.csv", cumsum_add(cad_ru), delimiter=",")
