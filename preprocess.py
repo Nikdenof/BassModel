@@ -9,9 +9,12 @@ import numpy as np
 
 
 # Загрузка начальных данных
-RAW_DATA= "SAPR.xlsx"
+RAW_DATA = "SAPR.xlsx"
 RAW_DATA_DIR = "data/raw/"
 PROCESSED_DIR = "data/processed/"
+
+def load_df(arg) -> return_type:
+    pass
 
 table = pd.read_excel(RAW_DATA_DIR+RAW_DATA, skiprows = 2, header = None)
 table = table.transpose()[1:]
@@ -22,10 +25,10 @@ cad_en = table[["Years", "Foreign"]].copy()
 cad_ru = table[["Years", "Domestic"]].copy()
 
 
-def cumsum_add(df_mod):
+def cumsum_add(df_mod: pd.DataFrame) -> np.ndarray:
     """
     Выделение столбца кумулятивной суммы, 
-    замена формата dataframe на numpy array
+    dataframe в numpy array
     """
     df_mod = df_mod.rename(columns={df_mod.columns[1]: "revenues"})
     df_mod['cum_sum'] = df_mod['revenues'].cumsum()

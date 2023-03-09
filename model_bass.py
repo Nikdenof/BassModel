@@ -3,23 +3,24 @@ from scipy.optimize import curve_fit
 from plots import fit_plt
 
 class BassModel:
-    def __init__(self, base_cumsum, base_sum, competetor_cumsum, competetor_sum):
+    def __init__(self, base_cumsum, base_sum, competetor_cumsum, competetor_sum) -> None:
         self.base_cumsum = base_cumsum
         self.base_sum = base_sum
         self.competetor_cumsum = competetor_cumsum
         self.competetor_sum = competetor_sum
 
     @staticmethod
-    def bass_function(x, p, q, m):
+    def bass_function(x: float, p: float, q: float, m: float) -> float:
         """
         This is a base bass function that has 3 parameters:
             m - the number of people estimated to eventually adopt the new product
             q - the coefficient of imitation
             p - the coefficient of innovation
+        It returns the result of calculated bass equation
         """
         return p * m + (q - p) * x - (q / m) * x ** 2
 
-    def fit(self, num_iterations=5000):
+    def fit(self, num_iterations: int=5000) -> list[float]:
         """
         This functions performes curve_fit function from the scipy module
         in order to find the coefficients of the bass function.
@@ -31,7 +32,7 @@ class BassModel:
         self.coeff_p, self.coeff_q, self.coeff_m = fit_coefficients
         return fit_coefficients
 
-#    def calc_prediction(self, num_years, start_value=0, visualize=False):
+#    def predict(self, arg) -> return_type:
 #        """ Calculates prediction based on computed coefficients, returns an array, containing cummulitive sum of bass function"""
 #        cum_sum = [start_value]
 #        for t in range(num_years):
