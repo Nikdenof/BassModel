@@ -13,8 +13,6 @@ RAW_DATA = "SAPR.xlsx"
 RAW_DATA_DIR = "data/raw/"
 PROCESSED_DIR = "data/processed/"
 
-def load_df(arg) -> return_type:
-    pass
 
 table = pd.read_excel(RAW_DATA_DIR+RAW_DATA, skiprows = 2, header = None)
 table = table.transpose()[1:]

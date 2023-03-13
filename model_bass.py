@@ -10,7 +10,8 @@ class BassModel:
         self.competetor_sum = competetor_sum
 
     @staticmethod
-    def bass_function(x: float, p: float, q: float, m: float) -> float:
+    def bass_function(X: list, p1: float, q1: float, m1: float, 
+                      p2: float, q2: float, m2: float, q12: float) -> tuple[float, float]:
         """
         This is a base bass function that has 3 parameters:
             m - the number of people estimated to eventually adopt the new product
@@ -18,7 +19,16 @@ class BassModel:
             p - the coefficient of innovation
         It returns the result of calculated bass equation
         """
-        return p * m + (q - p) * x - (q / m) * x ** 2
+        x1, x2 = X
+        bass1 = (p1 + (q1 / m1) * (x1)) * (m1 - x1) + (q12 / m1) * x1 * (m2 - x2) 
+        bass2 = (p2 + (q2 / m2) * (x2)) * (m2 - x2) + (q12 / m2) * x2 * (m1 - x1)
+        
+        return bass1, bass2
+#        return (p1 + (q1 / m1) * (x1)) * (m1 - x1), (p1 + (q1 / m1) * (x2)) * (m1 - x1)
+    # BASS 1[0] + BASS 2[0] == SUM of their real value
+    # NEED TO Come up with second value that will be BASS1/BASS2 and will be 
+    # SUM!!!!!!!!!!!!!!!!!!!! OF TWO VALUES
+    # NOT CUMSUM 
 
     def fit(self, num_iterations: int=5000) -> list[float]:
         """
@@ -26,8 +36,6 @@ class BassModel:
         in order to find the coefficients of the bass function.
         Returns an array of size equal to the number of coefficients
         """
-        #####
-        ##### CHANGE TO 4 points
         fit_coefficients, _ = curve_fit(self.bass_function, self.base_cumsum[0:5], self.base_sum[1:6], maxfev=num_iterations)
         self.coeff_p, self.coeff_q, self.coeff_m = fit_coefficients
         return fit_coefficients
