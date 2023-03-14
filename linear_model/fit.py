@@ -16,8 +16,8 @@ from plots import fit_plt
 # Начальные данные
 MODEL = "Linear"
 # MODEL = "Bass"
-_, cs_en = np.genfromtxt('outputs/sales_en.csv', delimiter=',') 
-_, cs_ru = np.genfromtxt('outputs/sales_ru.csv', delimiter=',') 
+_, cs_en = np.genfromtxt('../data/processed/sales_en.csv', delimiter=',') 
+_, cs_ru = np.genfromtxt('../data/processed/sales_ru.csv', delimiter=',') 
 n1 = n2 = 65000
 
 
@@ -62,8 +62,8 @@ def fit_model(cs_1, cs_2, popt_1, popt_2, t = 5):
 cs_fit_en = fit_model(cs_en, cs_ru, popt_en, popt_ru)[0]
 cs_fit_ru = fit_model(cs_ru, cs_en, popt_ru, popt_en)[0]
 
-fit_plt(cs_en, cs_fit_en, title = "Предсказание для иностранного ПО", save = 'outputs/foreign_pred.png')
-fit_plt(cs_ru, cs_fit_ru, title = "Предсказание для отечественного ПО", save = 'outputs/domestic_pred.png')
+# fit_plt(cs_en, cs_fit_en, title = "Предсказание для иностранного ПО", save = 'outputs/foreign_pred.png')
+# fit_plt(cs_ru, cs_fit_ru, title = "Предсказание для отечественного ПО", save = 'outputs/domestic_pred.png')
 
 print("Относительная абсолютная ошибка для аппроксимации данных продаж иностанного ПО =", rae(cs_fit_en[3:], cs_en[4:]))
 print("Относительная абсолютная ошибка для аппроксимации данных продаж отечественного ПО =", rae(cs_fit_ru[3:], cs_ru[4:]))

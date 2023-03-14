@@ -24,7 +24,7 @@ class BassModel:
         bass1 = (p1 + (q1 / m1) * (x1)) * (m1 - x1) + (q12 / m1) * x1 * (m2 - x2) 
         bass2 = (p2 + (q2 / m2) * (x2)) * (m2 - x2) + (q12 / m2) * x2 * (m1 - x1)
         
-        return bass1, bass2
+        return bass1 + bass2
 #        return (p1 + (q1 / m1) * (x1)) * (m1 - x1), (p1 + (q1 / m1) * (x2)) * (m1 - x1)
         # BASS 1[0] + BASS 2[0] == SUM of their real value
         # NEED TO Come up with second value that will be BASS1/BASS2 and will be 
@@ -34,6 +34,14 @@ class BassModel:
     def join_plus_transpose(lst1: list, lst2: list) -> np.array:
         return np.column_stack((lst1, lst2))
 
+    @staticmethod
+    def sum_calculate(lst1: list, lst2: list) -> list:
+        sum_lst = []
+        for x1, x2 in lst1, lst2:
+            sum_run = x1 + x2
+            sum_lst.append(sum_run)
+        return sum_lst 
+
     def fit(self, num_iterations: int=5000) -> list[float]:
         """
         This functions performes curve_fit function from the scipy module
@@ -41,8 +49,8 @@ class BassModel:
         Returns an array of size equal to the number of coefficients
         """
         ############# TRANSPOSE [[base1, base2,...] [compet1, compet 2 ..]] -> [[base1, competetor1], [base2, competor2], ..] 
-        fit_coefficients, _ = curve_fit(self.bass_function, self.join_plus_transpose(self.base_cumsum[0:5], self.competetor_cumsum[0:5]), 
-                                        self.join_plus_transpose(self.base_sum[1:6], self.competetor_sum[1:6]), 
+        fit_coefficients, _ = curve_fit(self.bass_function, (self.base_cumsum[0:5], self.competetor_cumsum[0:5]), 
+                                        self.sum_calculate(self.base_sum[1:6], self.competetor_sum[1:6]), 
                                         maxfev=num_iterations)
         self.coeff_p, self.coeff_q, self.coeff_m = fit_coefficients
         return fit_coefficients
