@@ -9,8 +9,8 @@ import numpy as np
 
 
 # Загрузка начальных данных
-RAW_DATA = "new_sapr.xlsx"
-# RAW_DATA = "SAPR.xlsx"
+#RAW_DATA = "new_sapr.xlsx"
+RAW_DATA = "SAPR.xlsx"
 RAW_DATA_DIR = "data/raw/"
 PROCESSED_DIR = "data/processed/"
 

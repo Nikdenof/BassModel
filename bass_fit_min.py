@@ -3,12 +3,12 @@ import numpy as np
 # from utils import rae
 from model_bass import BassModel
 
-sum_foreign, cumsum_foreign= np.genfromtxt('outputs/sales_en.csv', delimiter=',') 
-sum_russian, cumsum_russian = np.genfromtxt('outputs/sales_ru.csv', delimiter=',') 
+sum_foreign, cumsum_foreign= np.genfromtxt('data/processed/sales_en.csv', delimiter=',') 
+sum_russian, cumsum_russian = np.genfromtxt('data/processed/sales_ru.csv', delimiter=',') 
 
 bass_russian = BassModel(cumsum_russian, sum_russian, cumsum_foreign, sum_foreign)
 
-lst = bass_russian.fit()
+lst = bass_russian.fit(num_iterations=20000)
 # result = bass_russian.calc_prediction(num_years=7, visualize=True)
 # print(result)
 
