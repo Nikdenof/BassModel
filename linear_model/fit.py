@@ -62,16 +62,16 @@ def fit_model(cs_1, cs_2, popt_1, popt_2, t = 5):
 cs_fit_en = fit_model(cs_en, cs_ru, popt_en, popt_ru)[0]
 cs_fit_ru = fit_model(cs_ru, cs_en, popt_ru, popt_en)[0]
 
-# fit_plt(cs_en, cs_fit_en, title = "Предсказание для иностранного ПО", save = 'outputs/foreign_pred.png')
-# fit_plt(cs_ru, cs_fit_ru, title = "Предсказание для отечественного ПО", save = 'outputs/domestic_pred.png')
+# fit_plt(cs_en, cs_fit_en, title = "Предсказание для иностранного ПО", save = '../results/foreign_pred.png')
+# fit_plt(cs_ru, cs_fit_ru, title = "Предсказание для отечественного ПО", save = '../results/domestic_pred.png')
 
-print("Относительная абсолютная ошибка для аппроксимации данных продаж иностанного ПО =", rae(cs_fit_en[3:], cs_en[4:]))
-print("Относительная абсолютная ошибка для аппроксимации данных продаж отечественного ПО =", rae(cs_fit_ru[3:], cs_ru[4:]))
+# print("Относительная абсолютная ошибка для аппроксимации данных продаж иностанного ПО =", rae(cs_fit_en[3:], cs_en[4:]))
+# print("Относительная абсолютная ошибка для аппроксимации данных продаж отечественного ПО =", rae(cs_fit_ru[3:], cs_ru[4:]))
 
 # Предсказание линейной модели без субсидии
 prediction_en, prediction_ru = fit_model(cs_en, cs_ru, popt_en, popt_ru, t = 15)
 
-np.savetxt("outputs/base_prediction_ru.csv", prediction_ru, delimiter=",")
-np.savetxt("outputs/base_prediction_en.csv", prediction_en, delimiter=",")
-np.savetxt("outputs/coef_ru.csv", popt_ru, delimiter=",")
-np.savetxt("outputs/coef_en.csv", popt_en, delimiter=",")
+np.savetxt("../results/base_prediction_ru.csv", prediction_ru, delimiter=",")
+np.savetxt("../results/base_prediction_en.csv", prediction_en, delimiter=",")
+np.savetxt("../results/coef_ru.csv", popt_ru, delimiter=",")
+np.savetxt("../results/coef_en.csv", popt_en, delimiter=",")
