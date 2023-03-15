@@ -28,21 +28,13 @@ class BassModel:
         It returns the result of calculated bass equation
         """
         array_length = len(x) // 2
-        x1, x2 = split_joined_list(x, array_length) 
+        x1, x2 = split_joined_list(x, array_length) # dim(10,1) -> dim(5,2) 
         bass1 = (p1 + (q1 / m1) * (x1)) * (m1 - x1) + (q12 / m1) * x1 * (m2 - x2) 
         bass2 = (p2 + (q2 / m2) * (x2)) * (m2 - x2) + (q12 / m2) * x2 * (m1 - x1)
 
-        bass_joined = join_two_lists(bass1, bass2)  
+        bass_joined = join_two_lists(bass1, bass2) #dim(5,2) -> dim(10,1) 
         
         return bass_joined 
-#        return (p1 + (q1 / m1) * (x1)) * (m1 - x1), (p1 + (q1 / m1) * (x2)) * (m1 - x1)
-        # BASS 1[0] + BASS 2[0] == SUM of their real value
-        # NEED TO Come up with second value that will be BASS1/BASS2 and will be 
-        # SUM!!!!!!!!!!!!!!!!!!!! OF TWO VALUES
-        # NOT CUMSUM 
-#    @staticmethod
-#    def join_plus_transpose(lst1: list, lst2: list) -> np.array:
-#        return np.column_stack((lst1, lst2))
 
     @staticmethod
     def sum_calculate(lst1: list, lst2: list) -> list:
