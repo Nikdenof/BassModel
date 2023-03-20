@@ -9,8 +9,8 @@ class BassModel:
         self.base_sum = base_sum
         self.competetor_cumsum = competetor_cumsum
         self.competetor_sum = competetor_sum
-        self.m1 = 85,000
-        self.m2 = 100,000
+        self.m1 = 85000
+        self.m2 = 100000
 
     @staticmethod
     def join_two_lists(lst1: list, lst2: list) -> np.ndarray:
@@ -28,8 +28,8 @@ class BassModel:
         lst2 = lst_join[lst_len:]
         return lst1, lst2
 
-    def bass_function(self, x: list, p1: float, q1: float, m1: float, 
-                      p2: float, q2: float, m2: float, q12: float) -> list[float, float]:
+    def bass_function(self, x: list, p1: float, q1: float,
+                      p2: float, q2: float, q12: float) -> list[float, float]:
         """
         This is a base bass function that has 3 parameters:
             m1, m2 - the number of people estimated to eventually adopt the new product
@@ -40,9 +40,12 @@ class BassModel:
         """
         array_length = len(x) // 2
         x1, x2 = self.split_joined_list(x, array_length) # dim(10,1) -> dim(5,2) 
+        m1 = self.m1
+        m2 = self.m2
 
         bass1 = (p1 + (q1 / m1) * (x1)) * (m1 - x1) + (q12 / m1) * x1 * (m2 - x2) 
         bass2 = (p2 + (q2 / m2) * (x2)) * (m2 - x2) + (q12 / m2) * x2 * (m1 - x1)
+        
 
         bass_joined = self.join_two_lists(bass1, bass2) #dim(5,2) -> dim(10,1) 
         
@@ -69,8 +72,8 @@ class BassModel:
         return self.fit_coefficients
 
     @staticmethod
-    def bass_predict(x: list, p1: float, q1: float, m1: float, 
-                      p2: float, q2: float, m2: float, q12: float) -> list[float, float]:
+    def bass_predict(x: list, p1: float, q1: float, 
+                      p2: float, q2: float, q12: float, m1: float, m2: float) -> list[float, float]:
         """
         This is a base bass function that has 3 parameters:
             m1, m2 - the number of people estimated to eventually adopt the new product
@@ -98,7 +101,7 @@ class BassModel:
         # Need to provide info in the manner: [competetor_cumsum, base_cumsum]1 .. [c_cms, bs_cms]2 .. 
         # cumsum_joined = self.join_two_lists(self.base_cumsum[:array_length-1], self.competetor_cumsum[:array_length-1])
         for t in range(num_years):
-            running_sum = self.bass_predict(cumsum_predicted[t], *self.fit_coefficients)
+            running_sum = self.bass_predict(cumsum_predicted[t], *self.fit_coefficients, self.m1, self.m2)
             sum_predicted.append(running_sum)
             running_cumsum = [x + y for x, y in zip(cumsum_predicted[t], running_sum)] 
             cumsum_predicted.append(running_cumsum)
