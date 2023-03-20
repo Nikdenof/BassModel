@@ -9,6 +9,8 @@ class BassModel:
         self.base_sum = base_sum
         self.competetor_cumsum = competetor_cumsum
         self.competetor_sum = competetor_sum
+        self.m1 = 85,000
+        self.m2 = 100,000
 
     @staticmethod
     def join_two_lists(lst1: list, lst2: list) -> np.ndarray:
@@ -26,7 +28,7 @@ class BassModel:
         lst2 = lst_join[lst_len:]
         return lst1, lst2
 
-    def bass_function(self, x: float, p1: float, q1: float, m1: float, 
+    def bass_function(self, x: list, p1: float, q1: float, m1: float, 
                       p2: float, q2: float, m2: float, q12: float) -> list[float, float]:
         """
         This is a base bass function that has 3 parameters:
@@ -38,6 +40,7 @@ class BassModel:
         """
         array_length = len(x) // 2
         x1, x2 = self.split_joined_list(x, array_length) # dim(10,1) -> dim(5,2) 
+
         bass1 = (p1 + (q1 / m1) * (x1)) * (m1 - x1) + (q12 / m1) * x1 * (m2 - x2) 
         bass2 = (p2 + (q2 / m2) * (x2)) * (m2 - x2) + (q12 / m2) * x2 * (m1 - x1)
 
@@ -65,18 +68,42 @@ class BassModel:
         self.fit_coefficients, _ = curve_fit(self.bass_function, cumsum_joined, sum_joined, maxfev=num_iterations)
         return self.fit_coefficients
 
+    @staticmethod
+    def bass_predict(x: list, p1: float, q1: float, m1: float, 
+                      p2: float, q2: float, m2: float, q12: float) -> list[float, float]:
+        """
+        This is a base bass function that has 3 parameters:
+            m1, m2 - the number of people estimated to eventually adopt the new product
+            q1, q2  - the coefficient of imitation
+            p1, p2 - the coefficient of innovation
+            q12 - competative coefficient
+        It returns the result of calculated bass equation
+        """
+        x1, x2 = x
+        bass1 = (p1 + (q1 / m1) * (x1)) * (m1 - x1) + (q12 / m1) * x1 * (m2 - x2) 
+        bass2 = (p2 + (q2 / m2) * (x2)) * (m2 - x2) + (q12 / m2) * x2 * (m1 - x1)
+
+        bass_joined = [bass1, bass2]
+
+        return bass_joined
+
+
     def predict(self, num_years, visualize=False) -> np.ndarray:
         """ 
         Calculates prediction based on computed coefficients, returns an array, containing cummulitive sum of bass function
         """
+        cumsum_predicted = [[self.base_cumsum[0], self.competetor_cumsum[0]]] 
+#        cumsum_predicted = [[0, 0]] 
+        sum_predicted = []
         # Need to provide info in the manner: [competetor_cumsum, base_cumsum]1 .. [c_cms, bs_cms]2 .. 
-        cumsum_joined = self.join_two_lists(self.base_cumsum[:array_length-1], self.competetor_cumsum[:array_length-1])
+        # cumsum_joined = self.join_two_lists(self.base_cumsum[:array_length-1], self.competetor_cumsum[:array_length-1])
         for t in range(num_years):
-            running_sum = self.bass_function(cumsum_joined[t], *self.fit_coefficients)
-            running_cumsum = cum_sum[t] + running_sum
-            cum_sum.append(running_cumsum)
-        self.fit_predict = cum_sum
-        return cum_sum
+            running_sum = self.bass_predict(cumsum_predicted[t], *self.fit_coefficients)
+            sum_predicted.append(running_sum)
+            running_cumsum = [x + y for x, y in zip(cumsum_predicted[t], running_sum)] 
+            cumsum_predicted.append(running_cumsum)
+        self.fit_predict = cumsum_predicted 
+        return self.fit_predict 
 #
 #    def calc_err(self):
 #        pass

@@ -9,5 +9,5 @@ sum_russian, cumsum_russian = np.genfromtxt('data/processed/sales_ru.csv', delim
 bass_russian = BassModel(cumsum_russian, sum_russian, cumsum_foreign, sum_foreign)
 
 lst = bass_russian.fit(num_iterations=20000)
-# result = bass_russian.calc_prediction(num_years=7, visualize=True)
-# print(result)
+result = bass_russian.predict(num_years=7, visualize=True)
+print(result)
