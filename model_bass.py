@@ -59,16 +59,20 @@ class BassModel:
             sum_lst.append(sum_run)
         return sum_lst 
 
-    def fit(self, num_iterations: int=5000) -> list[float]:
+    def fit(self, num_iterations: int=5000, train_test_split: float = 0.85) -> list[float]:
         """
         This functions performes curve_fit function from the scipy module
         in order to find the coefficients of the bass function.
         Returns an array of size equal to the number of coefficients
         """
-        array_length = len(self.base_cumsum)
-        cumsum_joined = self.join_two_lists(self.base_cumsum[:array_length-1], self.competetor_cumsum[:array_length-1])
-        sum_joined = self.join_two_lists(self.base_sum[1:array_length], self.competetor_sum[1:array_length])
+        
+        train_length = int(len(self.base_cumsum) * train_test_split)
+        cumsum_joined = self.join_two_lists(self.base_cumsum[:train_length-1], self.competetor_cumsum[:train_length-1])
+        sum_joined = self.join_two_lists(self.base_sum[1:train_length], self.competetor_sum[1:train_length])
+        print(train_length)
+        print(len(self.base_cumsum))
         self.fit_coefficients, _ = curve_fit(self.bass_function, cumsum_joined, sum_joined, maxfev=num_iterations)
+        self.train_length = train_length
         return self.fit_coefficients
 
     @staticmethod
@@ -108,22 +112,22 @@ class BassModel:
         self.fit_predict = cumsum_predicted 
         if visualize:
             domestic, foreign = self.process_result(cumsum_predicted)
-            self.fit_plt(domestic, self.base_cumsum, num_years, title = "Placeholder")
-            self.fit_plt(foreign, self.competetor_cumsum, num_years, title = "Placeholder2")
+            self.fit_plt(domestic, self.base_cumsum, title = "Placeholder")
+            self.fit_plt(foreign, self.competetor_cumsum, title = "Placeholder2")
         return self.fit_predict 
 
 
     @staticmethod
-    def process_result(result) -> tuple[np.ndarray, np.ndarray]:
+    def process_result(result: list) -> tuple[np.ndarray, np.ndarray]:
         data = np.array(result)
         data = data.transpose()
         data_1, data_2 = data
         return data_1, data_2
 
 
-    @staticmethod
-    def fit_plt(data, train_data, num_years, title):
-        plt.plot(np.arange(len(data)), data, label = 'Аппроксимация модели')
+    def fit_plt(self, data, train_data, title) -> None:
+        plt.plot(np.arange(self.train_length-1), data[:self.train_length - 1],'g--',  label = 'Аппроксимация модели') # Correct version -1 -> none
+        plt.plot(np.arange(self.train_length-2, len(data)), data[self.train_length-2:], 'r', label = 'Предсказание модели') #Correct version -2 -> -1
         plt.scatter(np.arange(len(train_data)), train_data, label = 'Исходные данные')
 #        plt.plot(np.arange(3, len(cs)), model_output[2: len(cs)-1], 'r',  label = 'Предсказания модели')
 #        plt.plot(np.arange(1, 4), model_output[:3], 'g--',  label = 'Аппроксимация модели')
