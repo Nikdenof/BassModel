@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.optimize import curve_fit 
-# from plots import fit_plt
+import matplotlib.pyplot as plt
 
 
 class BassModel:
@@ -91,7 +91,7 @@ class BassModel:
         return bass_joined
 
 
-    def predict(self, num_years, visualize=False) -> np.ndarray:
+    def predict(self, num_years, visualize=False) -> list:
         """ 
         Calculates prediction based on computed coefficients, returns an array, containing cummulitive sum of bass function
         """
@@ -106,9 +106,37 @@ class BassModel:
             running_cumsum = [x + y for x, y in zip(cumsum_predicted[t], running_sum)] 
             cumsum_predicted.append(running_cumsum)
         self.fit_predict = cumsum_predicted 
+        if visualize:
+            domestic, foreign = self.process_result(cumsum_predicted)
+            self.fit_plt(domestic, self.base_cumsum, num_years, title = "Placeholder")
+            self.fit_plt(foreign, self.competetor_cumsum, num_years, title = "Placeholder2")
         return self.fit_predict 
-#
-#    def calc_err(self):
-#        pass
-#    def minimize(self, visualize=False):
-#        pass
+
+
+    @staticmethod
+    def process_result(result) -> tuple[np.ndarray, np.ndarray]:
+        data = np.array(result)
+        data = data.transpose()
+        data_1, data_2 = data
+        return data_1, data_2
+
+
+    @staticmethod
+    def fit_plt(data, train_data, num_years, title):
+        plt.plot(np.arange(len(data)), data, label = 'Аппроксимация модели')
+        plt.scatter(np.arange(len(train_data)), train_data, label = 'Исходные данные')
+#        plt.plot(np.arange(3, len(cs)), model_output[2: len(cs)-1], 'r',  label = 'Предсказания модели')
+#        plt.plot(np.arange(1, 4), model_output[:3], 'g--',  label = 'Аппроксимация модели')
+#        plt.plot(np.arange(2), [cs[0], model_output[0]], 'g--')
+#        plt.scatter(np.arange(6), cs, label = 'Исходные данные')
+        plt.title(label = title)
+        plt.legend()
+#        plt.savefig(save)
+        plt.show()
+
+
+    def calc_err(self):
+        pass
+
+    def minimize(self, visualize=False):
+        pass
