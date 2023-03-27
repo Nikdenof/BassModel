@@ -10,4 +10,3 @@ bass_russian = BassModel(cumsum_russian, sum_russian, cumsum_foreign, sum_foreig
 
 lst = bass_russian.fit(num_iterations=20000)
 result = bass_russian.predict(num_years=5, visualize=True)
-print(result)
