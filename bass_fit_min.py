@@ -1,6 +1,4 @@
 import numpy as np
-# from scipy.optimize import curve_fit 
-# from utils import rae
 from model_bass import BassModel
 
 sum_foreign, cumsum_foreign= np.genfromtxt('data/processed/sales_en.csv', delimiter=',') 
@@ -10,3 +8,11 @@ bass_russian = BassModel(cumsum_russian, sum_russian, cumsum_foreign, sum_foreig
 
 lst = bass_russian.fit(num_iterations=20000)
 result = bass_russian.predict(num_years=5, visualize=True)
+print(result)
+
+base_prediction = bass_russian.predict(num_years=15)[-1]
+print(f"Базовый прогноз через 10 лет = {base_prediction}")
+
+# Цель субсидии Q - увеличение продаж в 2030 году на 30 % в сравнении с прогнозом
+subsidy_goal = 1.3 * base_prediction[0]
+print("Цель субсидии Q =", subsidy_goal)

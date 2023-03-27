@@ -71,7 +71,8 @@ class BassModel:
         sum_joined = self.join_two_lists(self.base_sum[1:train_length], self.competetor_sum[1:train_length])
         print(train_length)
         print(len(self.base_cumsum))
-        self.fit_coefficients, _ = curve_fit(self.bass_function, cumsum_joined, sum_joined, maxfev=num_iterations)
+        b = (0.001, 100000)
+        self.fit_coefficients, _ = curve_fit(self.bass_function, cumsum_joined, sum_joined, maxfev=num_iterations, bounds=b)
         self.train_length = train_length
         return self.fit_coefficients
 
