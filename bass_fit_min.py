@@ -10,9 +10,12 @@ lst = bass_russian.fit(num_iterations=20000)
 result = bass_russian.predict(num_years=5, visualize=True)
 print(result)
 
-base_prediction = bass_russian.predict(num_years=15)[-1]
-print(f"Базовый прогноз через 10 лет = {base_prediction}")
+base_prediction = bass_russian.predict(num_years=15)
+print(f"Базовый прогноз через 10 лет = {base_prediction[-1]}")
 
 # Цель субсидии Q - увеличение продаж в 2030 году на 30 % в сравнении с прогнозом
-subsidy_goal = 1.3 * base_prediction[0]
+subsidy_goal = 1.3 * base_prediction[-1][0]
 print("Цель субсидии Q =", subsidy_goal)
+# Есть цель Q, нужна ступенчатая функция для s.
+subsidy_start= base_prediction[4]
+subsidy_length = 10 # in years

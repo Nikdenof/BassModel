@@ -113,8 +113,8 @@ class BassModel:
         self.fit_predict = cumsum_predicted 
         if visualize:
             domestic, foreign = self.process_result(cumsum_predicted)
-            self.fit_plt(domestic, self.base_cumsum, title = "Placeholder")
-            self.fit_plt(foreign, self.competetor_cumsum, title = "Placeholder2")
+            self.fit_plt(domestic, self.base_cumsum, title = "Модель Басса - местный производитель")
+            self.fit_plt(foreign, self.competetor_cumsum, title = "Модель Басса - иностранный производитель")
         return self.fit_predict 
 
 
@@ -130,15 +130,41 @@ class BassModel:
         plt.plot(np.arange(self.train_length-1), data[:self.train_length - 1],'g--',  label = 'Аппроксимация модели') # Correct version -1 -> none
         plt.plot(np.arange(self.train_length-2, len(data)), data[self.train_length-2:], 'r', label = 'Предсказание модели') #Correct version -2 -> -1
         plt.scatter(np.arange(len(train_data)), train_data, label = 'Исходные данные')
-#        plt.plot(np.arange(3, len(cs)), model_output[2: len(cs)-1], 'r',  label = 'Предсказания модели')
-#        plt.plot(np.arange(1, 4), model_output[:3], 'g--',  label = 'Аппроксимация модели')
-#        plt.plot(np.arange(2), [cs[0], model_output[0]], 'g--')
-#        plt.scatter(np.arange(6), cs, label = 'Исходные данные')
         plt.title(label = title)
         plt.legend()
 #        plt.savefig(save)
         plt.show()
 
+    def lin_model(s):
+        start_ru = sub_start_ru
+        start_en = sub_start_en
+        a1, b1, y1 = coefficients_ru
+        a2, b2, y2 = coefficients_en
+        x1 = []
+        x2 = []
+        s_lst = []
+        s_t = s[0]
+        for i in range(t):
+            if i == 4:
+                s_t = s[1]
+            elif i == 7:
+                s_t = s[2]
+            x1_i, x2_i = calc_x(start_ru, start_en, s_t)
+            x1.append(x1_i)
+            x2.append(x2_i)
+            s_lst.append(s_t)
+            start_ru = x1_i
+            start_en = x2_i
+
+        return x1, s_lst 
+
+    def objective(s):
+        _, s_lst = lin_model(s)
+        return sum(s_lst)
+
+    def sub_model(s):
+        x1, _ = lin_model(s)
+        return x1[-1]
 
     def calc_err(self):
         pass
