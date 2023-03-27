@@ -30,6 +30,7 @@ class BassModel:
 
     def bass_function(self, x: list, p1: float, q1: float,
                       p2: float, q2: float, q12: float) -> list[float, float]:
+
         """
         This is a base bass function that has 3 parameters:
             m1, m2 - the number of people estimated to eventually adopt the new product
@@ -134,6 +135,64 @@ class BassModel:
         plt.legend()
 #        plt.savefig(save)
         plt.show()
+
+    def bass_subsidy(self, x: list, subsidy_t: float) -> list[float, float]:
+        """
+        This is a subsidy bass function that has these parameters:
+            m1, m2 - the number of people estimated to eventually adopt the new product
+            q1, q2  - the coefficient of imitation
+            p1, p2 - the coefficient of innovation
+            q12 - competative coefficient
+            subsidy_t - subsidy value
+        It returns the result of calculated bass equation
+        """
+        x1, x2 = x
+        p1, q1, p2, q2, q12 = self.fit_coefficients
+        m1, m2 = self.m1, self.m2
+        bass1 = (p1 + (q1 / m1) * (x1)) * (m1 - x1 + subsidy_t) + (q12 / m1) * x1 * (m2 - x2) 
+        bass2 = (p2 + (q2 / m2) * (x2)) * (m2 - x2) + (q12 / m2) * x2 * (m1 - x1 + subsidy_t)
+
+        bass_joined = [bass1, bass2]
+
+        return bass_joined
+
+
+    def set_subsidy_length(self, years: int, num_steps: int) -> None:
+        """
+        In this funtion we set the number of years, during which the subsidy
+        will be in effect. The behaviour of the subsidy is a step function.
+        We can set number of steps using `num_steps` variable
+
+        Example:
+            10 years, `num_steps` == 3
+            self.steps = [0, 3, 6]
+        """
+        if years < 5:
+            raise Exception("Sorry, but the minimum subsidy length is 5 years")
+        if num_steps >= years - 1 or num_steps < 1:
+            raise ValueError("The number of steps for subsidy function should be less then number of years and greater than 0")
+        steps_history = [0]
+        calculated_step = years // num_steps
+        for i in range(num_steps - 1):
+            running_step = steps_history[i] + calculated_step
+            steps_history.append(running_step)
+        self.subsidy_steps = steps_history
+        self.subsidy_years = years
+        print("This is our steps", steps_history)
+
+    def subsidy_model(self, s):
+        subsidy_begin= len(self.base_cumsum) - 1
+        start_domestic = self.base_cumsum[subsidy_begin]
+        for i in range(self.subsidy_years):
+            #steps for loop
+        pass
+
+    def calc_x(start_ru, start_en, s_t):
+        a1, b1, y1 = coefficients_ru
+        a2, b2, y2 = coefficients_en
+        x1_i = a1 - b1 * (n1 - start_ru - s_t) + y1 * (n2 - start_en)
+        x2_i = a2 - b2 * (n2 - start_en) + y2 * (n1 - start_ru - s_t)
+        return x1_i, x2_i
 
     def lin_model(s):
         start_ru = sub_start_ru
