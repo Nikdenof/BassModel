@@ -22,4 +22,4 @@ subsidy_start= base_prediction[4]
 subsidy_length = 10 # in years
 
 
-bass_russian.set_subsidy_length(subsidy_length, 3)
+bass_russian.set_subsidy_length(10, 3)

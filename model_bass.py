@@ -183,9 +183,8 @@ class BassModel:
     def subsidy_model(self, s):
         subsidy_begin= len(self.base_cumsum) - 1
         start_domestic = self.base_cumsum[subsidy_begin]
-        for i in range(self.subsidy_years):
-            #steps for loop
-        pass
+        #for i in range(self.subsidy_years):
+        #steps for loop
 
     def calc_x(start_ru, start_en, s_t):
         a1, b1, y1 = coefficients_ru
