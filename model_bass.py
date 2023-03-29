@@ -158,9 +158,9 @@ class BassModel:
         return bass_joined
 
 
-    def set_subsidy_length(self, years: int, num_steps: int) -> None:
+    def set_subsidy(self, goal_q: int, years: int, num_steps: int) -> None:
         """
-        In this funtion we set the number of years, during which the subsidy
+        In this funtion we set the goal Q, number of years, during which the subsidy
         will be in effect. The behaviour of the subsidy is a step function.
         We can set number of steps using `num_steps` variable
 
@@ -179,6 +179,7 @@ class BassModel:
             steps_history.append(running_step)
         self.subsidy_steps = steps_history
         self.subsidy_years = years
+        self.goal_q = goal_q
         print("This is our steps", steps_history)
 
 
@@ -192,10 +193,10 @@ class BassModel:
         bass_domestic_i = self.base_cumsum[subsidy_begin]
         bass_foreign_i = self.competetor_cumsum[subsidy_begin]
         bass_domestic = []
-        bass_foreign = []
         subsidy_list = []
         pointer_subsidy = 0
         for i in range(self.subsidy_years):
+            print(bass_domestic_i)
             if i == self.subsidy_steps[pointer_subsidy]:
                 subsidy_t = s[pointer_subsidy]
                 pointer_subsidy += 1 if pointer_subsidy < len(self.subsidy_steps) - 1  else 0
@@ -227,30 +228,47 @@ class BassModel:
         """ 
         This constraint makes sure, that our final value is q
         """
-        return self.last_year_output(s) - q
+        return self.last_year_output(s) - self.goal_q
 
 
-    def subsidy_minimize(self, add_constraints: list = None, method: str = "SLSQP", num_iterations: int = 5000, 
-                         subsidy_upper_bound: int = 1000):
-        x0 = np.zeros(len(self.subsidy_list)) # предположительные значения субсидии s1, s2, s3
+    def subsidy_minimize(self, add_constraints: list = [], method: str = "trust-constr", num_iterations: int = 5000, 
+                         subsidy_upper_bound: int = 500, visualize: bool = False):
+        x0 = np.zeros(len(self.subsidy_steps)) # предположительные значения субсидии s1, s2, s3
 
         base_bound = (0, subsidy_upper_bound)
         bounds = []
-        for i in range(len(self.subsidy_list)):
+        for i in range(len(self.subsidy_steps)):
             bounds.append(base_bound)
         bounds = tuple(bounds)
+        print(bounds)
 
         constraints = []
         q_constraint = {'type': 'eq', 'fun': self.constr1}
         constraints.append(q_constraint)
         if add_constraints:
-            constraints.append(add_constraints)
+            constraints.extend(add_constraints)
+        print(constraints)
 
         options = {"maxiter": num_iterations}
 
-        solution = minimize(self.objective_function, x0 = x0, method = method, bounds = bnds, constraints = constraints, options=options)
-        return solution
+        self.solution = minimize(self.objective_function, x0 = x0, method = method, bounds = bounds, constraints = constraints, options=options)
+        if visualize:
+            self.solution_plot(self.solution)
+        return self.solution
 
+    
+    def solution_plot(self, solution) -> None:
+        end_point = len(self.base_cumsum) + self.subsidy_years
+        plt.plot(np.arange(len(self.base_cumsum), end_point), self.subsidy_model(solution.x)[0], 'r',  label = 'Выходные данные модели с учетом субсидии')
+        #plt.plot(np.arange(len(prediction_ru)), prediction_ru, label = 'Выходные данные модели без учета субсидии')
+        plt.plot(end_point - 1, self.goal_q, marker="o", markersize=10, markeredgecolor="red", markerfacecolor="green", label = "Цель субсидии Q") 
+        plt.title(label = 'Сравнение изначального прогноза и результата субсидии')
+        plt.legend()
+        plt.show()
+
+        plt.step(np.arange(self.subsidy_years), self.subsidy_model(solution.x)[1])
+        plt.title(label = "Измение размера субсидии в период ее действия")
+        plt.show()
 
     def calc_err(self):
         pass

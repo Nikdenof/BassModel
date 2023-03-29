@@ -7,7 +7,7 @@ sum_russian, cumsum_russian = np.genfromtxt('data/processed/sales_ru.csv', delim
 bass_russian = BassModel(cumsum_russian, sum_russian, cumsum_foreign, sum_foreign)
 
 lst = bass_russian.fit(num_iterations=20000)
-result = bass_russian.predict(num_years=5, visualize=True)
+result = bass_russian.predict(num_years=5, visualize=False)
 print(result)
 
 base_prediction = bass_russian.predict(num_years=15)
@@ -20,14 +20,23 @@ print("Цель субсидии Q =", subsidy_goal)
 # Есть цель Q, нужна ступенчатая функция для s.
 subsidy_start= base_prediction[4]
 subsidy_length = 10 # in years
+subsidy_steps = 5
 
 
-bass_russian.set_subsidy_length(10, 3)
+bass_russian.set_subsidy(subsidy_goal, subsidy_length, subsidy_steps)
+
 def constr2(s):
-    return s[1] - s[0]*1.1
+    return s[-1] - s[-2]*0.9
 
 def constr3(s):
-    return s[2] - s[1]*1.1
+    return s[2] - s[1]*0.8
+
 con2 = {'type': 'ineq', 'fun': constr2}
 
 con3 = {'type': 'ineq', 'fun': constr3}
+methods = ['Nelder-Mead', 'Powell', 'CG', 'BFGS', 'L-BFGS-B', 'TNC', 'COBYLA', 'SLSQP', 'trust-constr']
+print(bass_russian.subsidy_minimize(add_constraints = [con2, con3], method = methods[8], visualize=True))
+
+
+################ CHECK FUNCTION WITH S == 0
+print(bass_russian.subsidy_model([0, 0, 0, 0, 0]))
