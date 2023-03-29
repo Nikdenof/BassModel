@@ -23,3 +23,11 @@ subsidy_length = 10 # in years
 
 
 bass_russian.set_subsidy_length(10, 3)
+def constr2(s):
+    return s[1] - s[0]*1.1
+
+def constr3(s):
+    return s[2] - s[1]*1.1
+con2 = {'type': 'ineq', 'fun': constr2}
+
+con3 = {'type': 'ineq', 'fun': constr3}

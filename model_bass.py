@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.optimize import curve_fit 
+from scipy.optimize import curve_fit, minimize
 import matplotlib.pyplot as plt
 
 
@@ -136,6 +136,7 @@ class BassModel:
 #        plt.savefig(save)
         plt.show()
 
+
     def bass_subsidy(self, x: list, subsidy_t: float) -> list[float, float]:
         """
         This is a subsidy bass function that has these parameters:
@@ -180,52 +181,76 @@ class BassModel:
         self.subsidy_years = years
         print("This is our steps", steps_history)
 
-    def subsidy_model(self, s):
-        subsidy_begin= len(self.base_cumsum) - 1
-        start_domestic = self.base_cumsum[subsidy_begin]
-        #for i in range(self.subsidy_years):
-        #steps for loop
 
-    def calc_x(start_ru, start_en, s_t):
-        a1, b1, y1 = coefficients_ru
-        a2, b2, y2 = coefficients_en
-        x1_i = a1 - b1 * (n1 - start_ru - s_t) + y1 * (n2 - start_en)
-        x2_i = a2 - b2 * (n2 - start_en) + y2 * (n1 - start_ru - s_t)
-        return x1_i, x2_i
+    def subsidy_model(self, s: list) -> tuple[list, list]:
+        """
+        This function takes subsidy list.
+        Outputs the subsidy values, and the calculated bass_function
+        for each year of the subsidy
+        """
+        subsidy_begin = len(self.base_cumsum) - 1
+        bass_domestic_i = self.base_cumsum[subsidy_begin]
+        bass_foreign_i = self.competetor_cumsum[subsidy_begin]
+        bass_domestic = []
+        bass_foreign = []
+        subsidy_list = []
+        pointer_subsidy = 0
+        for i in range(self.subsidy_years):
+            if i == self.subsidy_steps[pointer_subsidy]:
+                subsidy_t = s[pointer_subsidy]
+                pointer_subsidy += 1 if pointer_subsidy < len(self.subsidy_steps) - 1  else 0
+            bass_domestic_i, bass_foreign_i = self.bass_subsidy([bass_domestic_i, bass_foreign_i], subsidy_t)
+            bass_domestic.append(bass_domestic_i)
+            subsidy_list.append(subsidy_t)
+        return bass_domestic, subsidy_list
 
-    def lin_model(s):
-        start_ru = sub_start_ru
-        start_en = sub_start_en
-        a1, b1, y1 = coefficients_ru
-        a2, b2, y2 = coefficients_en
-        x1 = []
-        x2 = []
-        s_lst = []
-        s_t = s[0]
-        for i in range(t):
-            if i == 4:
-                s_t = s[1]
-            elif i == 7:
-                s_t = s[2]
-            x1_i, x2_i = calc_x(start_ru, start_en, s_t)
-            x1.append(x1_i)
-            x2.append(x2_i)
-            s_lst.append(s_t)
-            start_ru = x1_i
-            start_en = x2_i
 
-        return x1, s_lst 
+    def objective_function(self, s):
+        """
+        The returned value is later minimized, the lower - the better,
+        while keeping all the constraints in place
+        """
+        _, subsidy_list = self.subsidy_model(s)
+        return sum(subsidy_list)
 
-    def objective(s):
-        _, s_lst = lin_model(s)
-        return sum(s_lst)
 
-    def sub_model(s):
-        x1, _ = lin_model(s)
-        return x1[-1]
+    def last_year_output(self, s):
+        """
+        Last year of the subsidy, used as one of constraints,
+        as we need it to be equal to Q
+        """
+        bass_domestic, _ = self.subsidy_model(s)
+        return bass_domestic[-1]
+
+
+    def constr1(self, s):
+        """ 
+        This constraint makes sure, that our final value is q
+        """
+        return self.last_year_output(s) - q
+
+
+    def subsidy_minimize(self, add_constraints: list = None, method: str = "SLSQP", num_iterations: int = 5000, 
+                         subsidy_upper_bound: int = 1000):
+        x0 = np.zeros(len(self.subsidy_list)) # предположительные значения субсидии s1, s2, s3
+
+        base_bound = (0, subsidy_upper_bound)
+        bounds = []
+        for i in range(len(self.subsidy_list)):
+            bounds.append(base_bound)
+        bounds = tuple(bounds)
+
+        constraints = []
+        q_constraint = {'type': 'eq', 'fun': self.constr1}
+        constraints.append(q_constraint)
+        if add_constraints:
+            constraints.append(add_constraints)
+
+        options = {"maxiter": num_iterations}
+
+        solution = minimize(self.objective_function, x0 = x0, method = method, bounds = bnds, constraints = constraints, options=options)
+        return solution
+
 
     def calc_err(self):
-        pass
-
-    def minimize(self, visualize=False):
         pass
