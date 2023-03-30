@@ -7,7 +7,7 @@ sum_russian, cumsum_russian = np.genfromtxt('data/processed/sales_ru.csv', delim
 bass_russian = BassModel(cumsum_russian, sum_russian, cumsum_foreign, sum_foreign)
 
 lst = bass_russian.fit(num_iterations=20000)
-result = bass_russian.predict(num_years=5, visualize=False)
+result = bass_russian.predict(num_years=5, visualize=True)
 print(result)
 
 base_prediction = bass_russian.predict(num_years=15)
@@ -25,17 +25,4 @@ subsidy_steps = 5
 
 bass_russian.set_subsidy(subsidy_goal, subsidy_length, subsidy_steps)
 
-
-def constr2(s):
-    return s[-1] - s[-2]*0.9
-
-def constr3(s):
-    return s[2] - s[1]*0.8
-
-con2 = {'type': 'ineq', 'fun': constr2}
-
-con3 = {'type': 'ineq', 'fun': constr3}
-methods = ['Nelder-Mead', 'Powell', 'CG', 'BFGS', 'L-BFGS-B', 'TNC', 'COBYLA', 'SLSQP', 'trust-constr']
-print(bass_russian.subsidy_minimize(method = methods[8], visualize=True, subsidy_upper_bound = 18000))
-
-
+print(bass_russian.subsidy_minimize(visualize=True, subsidy_upper_bound = 18000))
