@@ -88,9 +88,12 @@ class BassModel:
             q12 - competative coefficient
         It returns the result of calculated bass equation
         """
+        print("Prediction step")
         x1, x2 = x
         bass1 = (p1 + (q1 / m1) * (x1)) * (m1 - x1) + (q12 / m1) * x1 * (m2 - x2) 
         bass2 = (p2 + (q2 / m2) * (x2)) * (m2 - x2) + (q12 / m2) * x2 * (m1 - x1)
+        print(f"These are x1 and x2 = {x1, x2}, and their calculated bass functions {bass1, bass2}")
+        print()
 
         bass_joined = [bass1, bass2]
 
@@ -103,12 +106,12 @@ class BassModel:
         """
         cumsum_predicted = [[self.base_cumsum[0], self.competetor_cumsum[0]]] 
 #        cumsum_predicted = [[0, 0]] 
-        sum_predicted = []
+        #sum_predicted = []
         # Need to provide info in the manner: [competetor_cumsum, base_cumsum]1 .. [c_cms, bs_cms]2 .. 
         # cumsum_joined = self.join_two_lists(self.base_cumsum[:array_length-1], self.competetor_cumsum[:array_length-1])
         for t in range(num_years):
             running_sum = self.bass_predict(cumsum_predicted[t], *self.fit_coefficients, self.m1, self.m2)
-            sum_predicted.append(running_sum)
+        #    sum_predicted.append(running_sum)
             running_cumsum = [x + y for x, y in zip(cumsum_predicted[t], running_sum)] 
             cumsum_predicted.append(running_cumsum)
         self.fit_predict = cumsum_predicted 
@@ -150,9 +153,13 @@ class BassModel:
         x1, x2 = x
         p1, q1, p2, q2, q12 = self.fit_coefficients
         m1, m2 = self.m1, self.m2
+        print(f"this is x1 and x2 = {x1, x2}")
+        print("coefficients are =", p1, q1, p2, q2, q12, m1, m2)
+        print(f"x values are {x1, x2}")
         bass1 = (p1 + (q1 / m1) * (x1)) * (m1 - x1 + subsidy_t) + (q12 / m1) * x1 * (m2 - x2) 
         bass2 = (p2 + (q2 / m2) * (x2)) * (m2 - x2) + (q12 / m2) * x2 * (m1 - x1 + subsidy_t)
-
+        print(f"this is calculated bass functions= {bass1, bass2}")
+        print()
         bass_joined = [bass1, bass2]
 
         return bass_joined
@@ -190,20 +197,24 @@ class BassModel:
         for each year of the subsidy
         """
         subsidy_begin = len(self.base_cumsum) - 1
-        bass_domestic_i = self.base_cumsum[subsidy_begin]
-        bass_foreign_i = self.competetor_cumsum[subsidy_begin]
-        bass_domestic = []
+#        bass_domestic_i = self.base_cumsum[subsidy_begin]
+#        bass_foreign_i = self.competetor_cumsum[subsidy_begin]
+        bass_domestic = [self.base_cumsum[subsidy_begin]]
+        bass_foreign = [self.competetor_cumsum[subsidy_begin]]
         subsidy_list = []
         pointer_subsidy = 0
+#            running_sum = self.bass_predict(cumsum_predicted[t], *self.fit_coefficients, self.m1, self.m2)
+#            running_cumsum = [x + y for x, y in zip(cumsum_predicted[t], running_sum)] 
+#            cumsum_predicted.append(running_cumsum)
         for i in range(self.subsidy_years):
-            print(bass_domestic_i)
             if i == self.subsidy_steps[pointer_subsidy]:
                 subsidy_t = s[pointer_subsidy]
                 pointer_subsidy += 1 if pointer_subsidy < len(self.subsidy_steps) - 1  else 0
-            bass_domestic_i, bass_foreign_i = self.bass_subsidy([bass_domestic_i, bass_foreign_i], subsidy_t)
-            bass_domestic.append(bass_domestic_i)
+            bass_domestic_i, bass_foreign_i = self.bass_subsidy([bass_domestic[i], bass_foreign[i]], subsidy_t)
+            bass_domestic.append(bass_domestic[i] + bass_domestic_i)
+            bass_foreign.append(bass_foreign[i] + bass_foreign_i)
             subsidy_list.append(subsidy_t)
-        return bass_domestic, subsidy_list
+        return bass_domestic[1:], subsidy_list
 
 
     def objective_function(self, s):
@@ -232,7 +243,7 @@ class BassModel:
 
 
     def subsidy_minimize(self, add_constraints: list = [], method: str = "trust-constr", num_iterations: int = 5000, 
-                         subsidy_upper_bound: int = 500, visualize: bool = False):
+                         subsidy_upper_bound: int = 3000, visualize: bool = False):
         x0 = np.zeros(len(self.subsidy_steps)) # предположительные значения субсидии s1, s2, s3
 
         base_bound = (0, subsidy_upper_bound)

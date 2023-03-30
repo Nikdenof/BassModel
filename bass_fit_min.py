@@ -25,6 +25,7 @@ subsidy_steps = 5
 
 bass_russian.set_subsidy(subsidy_goal, subsidy_length, subsidy_steps)
 
+
 def constr2(s):
     return s[-1] - s[-2]*0.9
 
@@ -35,8 +36,6 @@ con2 = {'type': 'ineq', 'fun': constr2}
 
 con3 = {'type': 'ineq', 'fun': constr3}
 methods = ['Nelder-Mead', 'Powell', 'CG', 'BFGS', 'L-BFGS-B', 'TNC', 'COBYLA', 'SLSQP', 'trust-constr']
-print(bass_russian.subsidy_minimize(add_constraints = [con2, con3], method = methods[8], visualize=True))
+print(bass_russian.subsidy_minimize(method = methods[8], visualize=True, subsidy_upper_bound = 18000))
 
 
-################ CHECK FUNCTION WITH S == 0
-print(bass_russian.subsidy_model([0, 0, 0, 0, 0]))
