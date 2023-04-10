@@ -1,6 +1,7 @@
 import numpy as np
 from model_bass import BassModel
 
+# Import from config the location of sales
 sum_foreign, cumsum_foreign= np.genfromtxt('data/processed/sales_en.csv', delimiter=',') 
 sum_russian, cumsum_russian = np.genfromtxt('data/processed/sales_ru.csv', delimiter=',') 
 
@@ -18,7 +19,7 @@ subsidy_goal = 1.3 * base_prediction[-1][0]
 print("Цель субсидии Q =", subsidy_goal)
 
 # Есть цель Q, нужна ступенчатая функция для s.
-subsidy_start= base_prediction[4]
+#subsidy_start= base_prediction[4]
 subsidy_length = 10 # in years
 subsidy_steps = 5
 

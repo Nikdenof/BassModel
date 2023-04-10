@@ -88,12 +88,9 @@ class BassModel:
             q12 - competative coefficient
         It returns the result of calculated bass equation
         """
-        print("Prediction step")
         x1, x2 = x
         bass1 = (p1 + (q1 / m1) * (x1)) * (m1 - x1) + (q12 / m1) * x1 * (m2 - x2) 
         bass2 = (p2 + (q2 / m2) * (x2)) * (m2 - x2) + (q12 / m2) * x2 * (m1 - x1)
-        print(f"These are x1 and x2 = {x1, x2}, and their calculated bass functions {bass1, bass2}")
-        print()
 
         bass_joined = [bass1, bass2]
 
@@ -153,13 +150,8 @@ class BassModel:
         x1, x2 = x
         p1, q1, p2, q2, q12 = self.fit_coefficients
         m1, m2 = self.m1, self.m2
-        print(f"this is x1 and x2 = {x1, x2}")
-        print("coefficients are =", p1, q1, p2, q2, q12, m1, m2)
-        print(f"x values are {x1, x2}")
         bass1 = (p1 + (q1 / m1) * (x1)) * (m1 - x1 + subsidy_t) + (q12 / m1) * x1 * (m2 - x2) 
         bass2 = (p2 + (q2 / m2) * (x2)) * (m2 - x2) + (q12 / m2) * x2 * (m1 - x1 + subsidy_t)
-        print(f"this is calculated bass functions= {bass1, bass2}")
-        print()
         bass_joined = [bass1, bass2]
 
         return bass_joined
@@ -251,14 +243,12 @@ class BassModel:
         for i in range(len(self.subsidy_steps)):
             bounds.append(base_bound)
         bounds = tuple(bounds)
-        print(bounds)
 
         constraints = []
         q_constraint = {'type': 'eq', 'fun': self.constr1}
         constraints.append(q_constraint)
         if add_constraints:
             constraints.extend(add_constraints)
-        print(constraints)
 
         options = {"maxiter": num_iterations}
 
@@ -270,9 +260,11 @@ class BassModel:
     
     def solution_plot(self, solution) -> None:
         end_point = len(self.base_cumsum) + self.subsidy_years
-        plt.plot(np.arange(len(self.base_cumsum), end_point), self.subsidy_model(solution.x)[0], 'r',  label = 'Выходные данные модели с учетом субсидии')
-        #plt.plot(np.arange(len(prediction_ru)), prediction_ru, label = 'Выходные данные модели без учета субсидии')
-        plt.plot(end_point - 1, self.goal_q, marker="o", markersize=10, markeredgecolor="red", markerfacecolor="green", label = "Цель субсидии Q") 
+        plt.plot(np.arange(end_point - len(self.base_cumsum)), self.subsidy_model(solution.x)[0], 'r-*',  label = 'Выходные данные модели с учетом субсидии')
+#        plt.plot(np.arange(len(self.base_cumsum), end_point), self.subsidy_model(solution.x)[0], 'r',  label = 'Выходные данные модели с учетом субсидии')
+#        plt.plot(np.arange(len(self.base_cumsum)), self.base_cumsum, label = 'Выходные данные модели без учета субсидии')
+#        plt.plot(end_point - 1, self.goal_q, marker="o", markersize=10, markeredgecolor="red", markerfacecolor="green", label = "Цель субсидии Q") 
+        plt.plot(end_point - 1 - len(self.base_cumsum), self.goal_q, marker="o", markersize=10, markeredgecolor="red", markerfacecolor="green", label = "Цель субсидии Q") 
         plt.title(label = 'Сравнение изначального прогноза и результата субсидии')
         plt.legend()
         plt.show()
