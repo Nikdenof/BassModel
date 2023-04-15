@@ -260,7 +260,7 @@ class BassModel:
     
     def solution_plot(self, solution) -> None:
         end_point = len(self.base_cumsum) + self.subsidy_years
-        plt.plot(np.arange(end_point - len(self.base_cumsum)), self.subsidy_model(solution.x)[0], 'r-*',  label = 'Выходные данные модели с учетом субсидии')
+        plt.step(np.arange(end_point - len(self.base_cumsum)), self.subsidy_model(solution.x)[0], 'r-*',  label = 'Выходные данные модели с учетом субсидии')
 #        plt.plot(np.arange(len(self.base_cumsum), end_point), self.subsidy_model(solution.x)[0], 'r',  label = 'Выходные данные модели с учетом субсидии')
 #        plt.plot(np.arange(len(self.base_cumsum)), self.base_cumsum, label = 'Выходные данные модели без учета субсидии')
 #        plt.plot(end_point - 1, self.goal_q, marker="o", markersize=10, markeredgecolor="red", markerfacecolor="green", label = "Цель субсидии Q") 
