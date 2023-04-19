@@ -203,6 +203,7 @@ class BassModel:
                 subsidy_t = s[pointer_subsidy]
                 pointer_subsidy += 1 if pointer_subsidy < len(self.subsidy_steps) - 1  else 0
             bass_domestic_i, bass_foreign_i = self.bass_subsidy([bass_domestic[i], bass_foreign[i]], subsidy_t)
+            print(f"Bass non cummulitive = {bass_domestic_i}")
             bass_domestic.append(bass_domestic[i] + bass_domestic_i)
             bass_foreign.append(bass_foreign[i] + bass_foreign_i)
             subsidy_list.append(subsidy_t)
@@ -260,7 +261,11 @@ class BassModel:
     
     def solution_plot(self, solution) -> None:
         end_point = len(self.base_cumsum) + self.subsidy_years
-        plt.step(np.arange(end_point - len(self.base_cumsum)), self.subsidy_model(solution.x)[0], 'r-*',  label = 'Выходные данные модели с учетом субсидии')
+        print(solution.x)
+        print("Вычисление конечных результатов")
+        plt.plot(np.arange(end_point - len(self.base_cumsum)), self.subsidy_model(solution.x)[0], 'r-*',  label = 'Выходные данные модели с учетом субсидии')
+        print("Результаты без субсидии")
+        plt.plot(np.arange(end_point - len(self.base_cumsum)), self.subsidy_model([0, 0, 0, 0, 0])[0], 'g-^',  label = 'Выходные данные модели без учета субсидии')
 #        plt.plot(np.arange(len(self.base_cumsum), end_point), self.subsidy_model(solution.x)[0], 'r',  label = 'Выходные данные модели с учетом субсидии')
 #        plt.plot(np.arange(len(self.base_cumsum)), self.base_cumsum, label = 'Выходные данные модели без учета субсидии')
 #        plt.plot(end_point - 1, self.goal_q, marker="o", markersize=10, markeredgecolor="red", markerfacecolor="green", label = "Цель субсидии Q") 

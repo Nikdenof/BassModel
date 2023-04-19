@@ -27,3 +27,4 @@ subsidy_steps = 5
 bass_russian.set_subsidy(subsidy_goal, subsidy_length, subsidy_steps)
 
 print(bass_russian.subsidy_minimize(visualize=True, subsidy_upper_bound = 18000))
+

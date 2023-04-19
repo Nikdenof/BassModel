@@ -47,7 +47,8 @@ def consumer_constraints(s):
     """
     The price of some product that consumer buys
     should be smaller than some Q
-    P_q(x) <= Q
+    P_q(x) <= Q, 
+    where Q - person's income 
     """
     pass
 
