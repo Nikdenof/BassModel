@@ -19,10 +19,8 @@ subsidy_goal = 1.3 * base_prediction[-1][0]
 print("Цель субсидии Q =", subsidy_goal)
 
 # Есть цель Q, нужна ступенчатая функция для s.
-#subsidy_start= base_prediction[4]
 subsidy_length = 10 # in years
-subsidy_steps = 5
-
+subsidy_steps = 1 
 
 bass_russian.set_subsidy(subsidy_goal, subsidy_length, subsidy_steps)
 

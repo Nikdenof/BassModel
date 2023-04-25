@@ -102,13 +102,8 @@ class BassModel:
         Calculates prediction based on computed coefficients, returns an array, containing cummulitive sum of bass function
         """
         cumsum_predicted = [[self.base_cumsum[0], self.competetor_cumsum[0]]] 
-#        cumsum_predicted = [[0, 0]] 
-        #sum_predicted = []
-        # Need to provide info in the manner: [competetor_cumsum, base_cumsum]1 .. [c_cms, bs_cms]2 .. 
-        # cumsum_joined = self.join_two_lists(self.base_cumsum[:array_length-1], self.competetor_cumsum[:array_length-1])
         for t in range(num_years):
             running_sum = self.bass_predict(cumsum_predicted[t], *self.fit_coefficients, self.m1, self.m2)
-        #    sum_predicted.append(running_sum)
             running_cumsum = [x + y for x, y in zip(cumsum_predicted[t], running_sum)] 
             cumsum_predicted.append(running_cumsum)
         self.fit_predict = cumsum_predicted 
@@ -169,7 +164,7 @@ class BassModel:
         """
         if years < 5:
             raise Exception("Sorry, but the minimum subsidy length is 5 years")
-        if num_steps >= years - 1 or num_steps < 1:
+        if num_steps >= years+1 or num_steps < 1:
             raise ValueError("The number of steps for subsidy function should be less then number of years and greater than 0")
         steps_history = [0]
         calculated_step = years // num_steps
@@ -189,20 +184,16 @@ class BassModel:
         for each year of the subsidy
         """
         subsidy_begin = len(self.base_cumsum) - 1
-#        bass_domestic_i = self.base_cumsum[subsidy_begin]
-#        bass_foreign_i = self.competetor_cumsum[subsidy_begin]
         bass_domestic = [self.base_cumsum[subsidy_begin]]
         bass_foreign = [self.competetor_cumsum[subsidy_begin]]
         subsidy_list = []
         pointer_subsidy = 0
-#            running_sum = self.bass_predict(cumsum_predicted[t], *self.fit_coefficients, self.m1, self.m2)
-#            running_cumsum = [x + y for x, y in zip(cumsum_predicted[t], running_sum)] 
-#            cumsum_predicted.append(running_cumsum)
         for i in range(self.subsidy_years):
             if i == self.subsidy_steps[pointer_subsidy]:
                 subsidy_t = s[pointer_subsidy]
                 pointer_subsidy += 1 if pointer_subsidy < len(self.subsidy_steps) - 1  else 0
             bass_domestic_i, bass_foreign_i = self.bass_subsidy([bass_domestic[i], bass_foreign[i]], subsidy_t)
+            print(i)
             print(f"Bass non cummulitive = {bass_domestic_i}")
             bass_domestic.append(bass_domestic[i] + bass_domestic_i)
             bass_foreign.append(bass_foreign[i] + bass_foreign_i)
@@ -262,10 +253,8 @@ class BassModel:
     def solution_plot(self, solution) -> None:
         end_point = len(self.base_cumsum) + self.subsidy_years
         print(solution.x)
-        print("Вычисление конечных результатов")
         plt.plot(np.arange(end_point - len(self.base_cumsum)), self.subsidy_model(solution.x)[0], 'r-*',  label = 'Выходные данные модели с учетом субсидии')
-        print("Результаты без субсидии")
-        plt.plot(np.arange(end_point - len(self.base_cumsum)), self.subsidy_model([0, 0, 0, 0, 0])[0], 'g-^',  label = 'Выходные данные модели без учета субсидии')
+#        plt.plot(np.arange(end_point - len(self.base_cumsum)), self.subsidy_model([0, 0, 0, 0, 0])[0], 'g-^',  label = 'Выходные данные модели без учета субсидии')
 #        plt.plot(np.arange(len(self.base_cumsum), end_point), self.subsidy_model(solution.x)[0], 'r',  label = 'Выходные данные модели с учетом субсидии')
 #        plt.plot(np.arange(len(self.base_cumsum)), self.base_cumsum, label = 'Выходные данные модели без учета субсидии')
 #        plt.plot(end_point - 1, self.goal_q, marker="o", markersize=10, markeredgecolor="red", markerfacecolor="green", label = "Цель субсидии Q") 
